@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Pesanin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .hero { padding: 12px 16px; }
+    .restaurants-grid { padding: 0 16px 80px; display: flex; flex-direction: column; gap: 12px; }
+    .cat-strip { display: flex; overflow-x: auto; padding: 10px 12px; gap: 4px; background: white; border-bottom: 1px solid #eee; }
+    .cat-strip::-webkit-scrollbar { display: none; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div style="padding: 12px 16px 8px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:22px; font-weight:800; letter-spacing:-0.5px;">Pesanin</span>
+          <span style="font-size:11px; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:20px;">Yogyakarta</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <a id="authLink" href="/auth.html" style="color:rgba(255,255,255,0.85);font-size:12px;text-decoration:none;background:rgba(255,255,255,0.15);padding:5px 12px;border-radius:20px;">Masuk</a>
+          <a href="/admin.html" style="color:rgba(255,255,255,0.85);font-size:12px;text-decoration:none;background:rgba(255,255,255,0.15);padding:5px 12px;border-radius:20px;">⚙️</a>
+        </div>
+      </div>
+      <div class="search-bar">
+        <svg width="16" height="16" fill="none" stroke="#999" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="searchInput" placeholder="Cari restoran atau makanan..." autocomplete="off">
+        <button id="clearSearch" style="display:none; background:none; border:none; color:#999; cursor:pointer; font-size:16px; padding:0;">✕</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="cat-strip" id="catStrip"></div>
+
+  <div class="hero">
+    <div class="promo-banner">
+      <div style="font-size:11px; font-weight:700; background:#FF5C00; color:white; display:inline-block; padding:3px 10px; border-radius:20px; margin-bottom:8px;">PROMO HARI INI</div>
+      <div style="font-size:20px; font-weight:800; margin-bottom:4px;">Gratis Ongkos Kirim!</div>
+      <div style="font-size:13px; opacity:0.85;">Pesan sekarang dan nikmati kemudahannya</div>
+    </div>
+  </div>
+
+  <div style="padding: 4px 16px 10px; display:flex; align-items:center; justify-content:space-between;">
+    <span style="font-size:15px; font-weight:700; color:#1A1A1A;" id="sectionTitle">Restoran Populer</span>
+    <span id="resultCount" style="font-size:12px; color:#999;"></span>
+  </div>
+
+  <div class="restaurants-grid" id="restaurantsList">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/home.js"></script>
+  <script src="/js/nav.js"></script>
+  <script>
+    // Update header based on auth state
+    (function() {
+      const u = Auth.getUser();
+      const link = document.getElementById('authLink');
+      if (u && link) {
+        link.textContent = (u.avatar || '😊') + ' ' + u.name.split(' ')[0];
+        link.href = '/profile.html';
+      }
+    })();
+  </script>
+</body>
+</html>

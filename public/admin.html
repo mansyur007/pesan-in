@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Admin Dashboard - Pesanin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-header { background: var(--green); color: white; padding: 14px 16px; position: sticky; top: 0; z-index: 100; }
+    .tabs { display: flex; background: white; border-bottom: 2px solid #eee; position: sticky; top: 52px; z-index: 90; }
+    .tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; background: none; border-top: none; border-left: none; border-right: none; }
+    .tab.active { color: var(--green); border-bottom-color: var(--green); }
+    .panel { display: none; padding: 12px 16px 80px; }
+    .panel.active { display: block; }
+    .rest-row { background: white; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .toggle-btn { padding: 6px 14px; border-radius: 20px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .toggle-open { background: #D4EDDA; color: #155724; }
+    .toggle-closed { background: #F8D7DA; color: #721C24; }
+    .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-chip { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #ddd; background: white; font-size: 12px; font-weight: 600; color: #555; cursor: pointer; white-space: nowrap; }
+    .filter-chip.active { background: var(--green); border-color: var(--green); color: white; }
+    .order-expand { font-size: 12px; color: var(--green); cursor: pointer; margin-top:6px; display:inline-block; }
+    .order-items-detail { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; }
+    .order-items-detail.open { display: block; }
+    .status-select { border: 1.5px solid #ddd; border-radius: 8px; padding: 5px 8px; font-size: 12px; font-weight: 600; background: white; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:17px;font-weight:800;">Admin Dashboard</div>
+        <div style="font-size:11px;opacity:0.8;">Pesanin Yogyakarta</div>
+      </div>
+      <a href="/" style="color:rgba(255,255,255,0.85);font-size:12px;text-decoration:none;background:rgba(255,255,255,0.15);padding:5px 12px;border-radius:20px;">← Beranda</a>
+    </div>
+  </div>
+
+  <div class="tabs" style="overflow-x:auto;scrollbar-width:none;">
+    <button class="tab active" data-panel="orders" style="white-space:nowrap;">Pesanan</button>
+    <button class="tab" data-panel="restaurants" style="white-space:nowrap;">Restoran</button>
+    <button class="tab" data-panel="users" style="white-space:nowrap;">Users</button>
+    <button class="tab" data-panel="drivers" style="white-space:nowrap;">Driver</button>
+    <button class="tab" data-panel="analytics" style="white-space:nowrap;">Analitik</button>
+  </div>
+
+  <div class="panel active" id="panel-orders">
+    <div style="margin-bottom:6px;">
+      <select id="restFilter" class="form-input" style="font-size:13px;padding:8px 12px;">
+        <option value="">Semua Restoran</option>
+      </select>
+    </div>
+    <div class="filter-bar" id="statusFilter">
+      <button class="filter-chip active" data-status="all">Semua</button>
+      <button class="filter-chip" data-status="pending">Pending</button>
+      <button class="filter-chip" data-status="confirmed">Dikonfirmasi</button>
+      <button class="filter-chip" data-status="preparing">Dimasak</button>
+      <button class="filter-chip" data-status="ready">Siap</button>
+      <button class="filter-chip" data-status="picked_up">Dikirim</button>
+      <button class="filter-chip" data-status="delivered">Selesai</button>
+      <button class="filter-chip" data-status="cancelled">Batal</button>
+    </div>
+    <div id="ordersList"><div class="loader"><div class="spinner"></div></div></div>
+  </div>
+
+  <div class="panel" id="panel-restaurants">
+    <div id="restList"><div class="loader"><div class="spinner"></div></div></div>
+  </div>
+
+  <div class="panel" id="panel-users">
+    <div id="usersList"><div class="loader"><div class="spinner"></div></div></div>
+  </div>
+
+  <div class="panel" id="panel-drivers">
+    <div id="driversList"><div class="loader"><div class="spinner"></div></div></div>
+  </div>
+
+  <div class="panel" id="panel-analytics">
+    <div id="analyticsContent"><div class="loader"><div class="spinner"></div></div></div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+  (function () {
+    let restaurants = [];
+    let activeRestId = '';
+    let activeStatus = 'all';
+
+    const STATUS_LABELS = {
+      pending: 'Pending', confirmed: 'Dikonfirmasi', preparing: 'Dimasak',
+      ready: 'Siap', picked_up: 'Dikirim', delivered: 'Selesai', cancelled: 'Batal'
+    };
+    const NEXT_STATUS = {
+      pending: 'confirmed', confirmed: 'preparing', preparing: 'ready',
+      ready: 'picked_up', picked_up: 'delivered'
+    };
+
+    // Tabs (handled below with lazy load)
+
+    // Status filter
+    document.getElementById('statusFilter').querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.getElementById('statusFilter').querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeStatus = chip.dataset.status;
+        loadOrders();
+      });
+    });
+
+    document.getElementById('restFilter').addEventListener('change', e => {
+      activeRestId = e.target.value;
+      loadOrders();
+    });
+
+    async function loadRestaurants() {
+      restaurants = await API.get('/restaurants');
+      const sel = document.getElementById('restFilter');
+      restaurants.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.id;
+        opt.textContent = r.name;
+        sel.appendChild(opt);
+      });
+      renderRestList();
+    }
+
+    function renderRestList() {
+      const list = document.getElementById('restList');
+      list.innerHTML = restaurants.map(r => `
+        <div class="rest-row" id="rrow-${r.id}">
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;">${r.name}</div>
+            <div style="font-size:12px;color:#777;">${r.address || ''}</div>
+          </div>
+          <button class="toggle-btn ${r.is_open ? 'toggle-open' : 'toggle-closed'}" onclick="toggleRest(${r.id})">
+            ${r.is_open ? '🟢 Buka' : '🔴 Tutup'}
+          </button>
+        </div>`).join('');
+    }
+
+    window.toggleRest = async function (id) {
+      await API.put(`/restaurants/${id}/toggle`);
+      const r = restaurants.find(r => r.id === id);
+      if (r) r.is_open = r.is_open ? 0 : 1;
+      renderRestList();
+      showToast('Status restoran diperbarui');
+    };
+
+    async function loadOrders() {
+      const list = document.getElementById('ordersList');
+      list.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+      const targets = activeRestId ? [{ id: activeRestId }] : restaurants;
+      let allOrders = [];
+      for (const r of targets) {
+        let url = `/orders/restaurant/${r.id}`;
+        if (activeStatus && activeStatus !== 'all') url += `?status=${activeStatus}`;
+        const orders = await API.get(url);
+        const rName = restaurants.find(x => x.id == r.id)?.name || '';
+        orders.forEach(o => o._restaurantName = rName);
+        allOrders = allOrders.concat(orders);
+      }
+      allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      if (!allOrders.length) {
+        list.innerHTML = `<div class="empty-state" style="padding:40px 0"><div class="icon">📋</div><div>Tidak ada pesanan</div></div>`;
+        return;
+      }
+      list.innerHTML = allOrders.map(o => {
+        const next = NEXT_STATUS[o.status];
+        return `
+          <div class="admin-order-card" id="ocard-${o.order_code}">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:700;color:var(--green-dark);">${o.order_code}</span>
+              <span class="status-badge status-${o.status}">${STATUS_LABELS[o.status] || o.status}</span>
+            </div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:2px;">${o.customer_name}</div>
+            <div style="font-size:12px;color:#777;margin-bottom:2px;">📞 ${o.customer_phone}</div>
+            <div style="font-size:12px;color:#777;margin-bottom:2px;">📍 ${o.customer_address}</div>
+            <div style="font-size:12px;color:#555;margin-bottom:6px;">🏪 ${o._restaurantName} · ${formatRupiah(o.total)}</div>
+            ${o.notes ? `<div style="font-size:12px;color:#888;margin-bottom:6px;">📝 ${o.notes}</div>` : ''}
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              ${next ? `<button class="btn-primary" style="width:auto;padding:7px 16px;font-size:12px;" onclick="updateStatus('${o.order_code}','${next}')">→ ${STATUS_LABELS[next]}</button>` : ''}
+              ${o.status !== 'cancelled' && o.status !== 'delivered' ? `<button onclick="updateStatus('${o.order_code}','cancelled')" style="padding:7px 14px;border-radius:20px;border:1.5px solid #F8D7DA;background:white;color:#721C24;font-size:12px;font-weight:700;cursor:pointer;">Batalkan</button>` : ''}
+            </div>
+            <span class="order-expand" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.nextElementSibling.classList.contains('open')?'▲ Sembunyikan':'▼ Detail item'">▼ Detail item</span>
+            <div class="order-items-detail" id="items-${o.order_code}">
+              <div style="font-size:12px;color:#777;">Memuat...</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    document.getElementById('ordersList').addEventListener('click', async e => {
+      const expand = e.target.closest('.order-expand');
+      if (!expand) return;
+      const code = expand.nextElementSibling.id.replace('items-', '');
+      const detail = document.getElementById('items-' + code);
+      if (detail.classList.contains('open') && detail.dataset.loaded) return;
+      const order = await API.get(`/orders/${code}`);
+      detail.dataset.loaded = '1';
+      detail.innerHTML = order.items.map(i =>
+        `<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:#555;"><span>${i.quantity}x ${i.menu_item_name}</span><span>${formatRupiah(i.subtotal)}</span></div>`
+      ).join('');
+    });
+
+    window.updateStatus = async function (code, status) {
+      await API.put(`/orders/${code}/status`, { status });
+      showToast('Status diperbarui');
+      loadOrders();
+    };
+
+    // Users panel
+    async function loadUsers() {
+      const list = document.getElementById('usersList');
+      // Fetch all users via admin endpoint (uses existing restaurants endpoint as proxy, or direct db query via custom endpoint)
+      // We'll use the auth/me endpoint pattern — admin can see all users
+      // For now, load from a general users API (we'll add it)
+      list.innerHTML = '<div style="padding:16px;font-size:13px;color:#777;">Memuat data users...</div>';
+      try {
+        const users = await API.get('/auth/users');
+        list.innerHTML = users.map(u => `
+          <div class="rest-row" style="flex-wrap:wrap;gap:8px;">
+            <div style="font-size:22px;">${u.avatar || '😊'}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:700;">${u.name}</div>
+              <div style="font-size:12px;color:#777;">${u.email} · ${u.phone || '—'}</div>
+              <div style="font-size:11px;color:#999;">${new Date(u.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</div>
+            </div>
+            <span class="status-badge ${u.role === 'driver' ? 'status-confirmed' : u.role === 'admin' ? 'status-ready' : 'status-pending'}">${u.role}</span>
+          </div>`).join('');
+      } catch { list.innerHTML = '<div style="padding:16px;color:#999;font-size:13px;">Tidak ada akses</div>'; }
+    }
+
+    // Drivers panel
+    async function loadAdminDrivers() {
+      const list = document.getElementById('driversList');
+      const drivers = await API.get('/drivers');
+      if (!drivers.length) { list.innerHTML = '<div style="padding:24px;text-align:center;color:#999;">Belum ada driver terdaftar</div>'; return; }
+      list.innerHTML = drivers.map(d => `
+        <div class="rest-row" style="flex-wrap:wrap;gap:8px;">
+          <div style="font-size:24px;">${d.avatar || '🛵'}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:14px;font-weight:700;">${d.name}</div>
+            <div style="font-size:12px;color:#777;">${d.vehicle_type === 'mobil' ? '🚗' : '🛵'} ${d.vehicle_model || '—'} · ${d.vehicle_plate || '—'}</div>
+            <div style="font-size:12px;color:#555;">⭐${d.rating.toFixed(1)} · ${d.total_trips} trip · Rp ${d.base_price.toLocaleString('id-ID')}+${d.price_per_km.toLocaleString('id-ID')}/km</div>
+          </div>
+          <span class="status-badge ${d.is_available ? 'status-delivered' : 'status-cancelled'}">${d.is_available ? 'Online' : 'Offline'}</span>
+        </div>`).join('');
+    }
+
+    // Analytics panel
+    async function loadAnalytics() {
+      const el = document.getElementById('analyticsContent');
+      const [rests, drivers] = await Promise.all([API.get('/restaurants'), API.get('/drivers')]);
+      let totalOrders = 0, totalRevenue = 0;
+      for (const r of rests) {
+        const orders = await API.get(`/orders/restaurant/${r.id}`);
+        totalOrders += orders.length;
+        totalRevenue += orders.reduce((s, o) => s + (o.total || 0), 0);
+      }
+      el.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+          <div style="background:white;border-radius:14px;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+            <div style="font-size:28px;font-weight:900;color:var(--green-dark);">${rests.length}</div>
+            <div style="font-size:11px;color:#999;font-weight:700;text-transform:uppercase;">Restoran</div>
+          </div>
+          <div style="background:white;border-radius:14px;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+            <div style="font-size:28px;font-weight:900;color:var(--green-dark);">${drivers.length}</div>
+            <div style="font-size:11px;color:#999;font-weight:700;text-transform:uppercase;">Driver</div>
+          </div>
+          <div style="background:white;border-radius:14px;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+            <div style="font-size:28px;font-weight:900;color:var(--green-dark);">${totalOrders}</div>
+            <div style="font-size:11px;color:#999;font-weight:700;text-transform:uppercase;">Total Order</div>
+          </div>
+          <div style="background:white;border-radius:14px;padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+            <div style="font-size:18px;font-weight:900;color:var(--green-dark);">Rp ${totalRevenue.toLocaleString('id-ID')}</div>
+            <div style="font-size:11px;color:#999;font-weight:700;text-transform:uppercase;">Total Revenue</div>
+          </div>
+        </div>
+        <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+          <div style="font-size:13px;font-weight:700;color:#444;margin-bottom:10px;">Restoran by Rating</div>
+          ${rests.sort((a,b) => b.rating-a.rating).map(r => `
+            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:13px;">
+              <span>${r.name}</span>
+              <span style="color:var(--green-dark);font-weight:700;">⭐${r.rating}</span>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    // Tab switching with lazy load
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+        const p = tab.dataset.panel;
+        if (p === 'users' && !tab.dataset.loaded) { loadUsers(); tab.dataset.loaded = '1'; }
+        if (p === 'drivers' && !tab.dataset.loaded) { loadAdminDrivers(); tab.dataset.loaded = '1'; }
+        if (p === 'analytics' && !tab.dataset.loaded) { loadAnalytics(); tab.dataset.loaded = '1'; }
+      });
+    });
+
+    loadRestaurants().then(loadOrders);
+    setInterval(loadOrders, 30000);
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Keranjang - Pesanin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-header { background: var(--green); color: white; padding: 14px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .page-header button { background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; line-height: 1; }
+    .section-card { background: white; border-radius: 14px; margin: 12px 16px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .cart-item-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+    .cart-item-row:last-child { border-bottom: none; }
+    .summary-row { display: flex; justify-content: space-between; font-size: 14px; padding: 5px 0; color: #555; }
+    .summary-row.total { font-weight: 800; font-size: 15px; color: #1A1A1A; border-top: 1px solid #eee; margin-top: 6px; padding-top: 10px; }
+    .sticky-bottom { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: white; padding: 12px 16px; box-shadow: 0 -4px 16px rgba(0,0,0,0.1); z-index: 140; }
+    body { padding-bottom: 140px; }
+    .pay-method { display: flex; gap: 10px; margin-bottom: 14px; }
+    .pay-btn { flex: 1; padding: 12px 8px; border-radius: 14px; border: 2px solid #eee; background: white; font-size: 12px; font-weight: 600; color: #555; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .pay-btn.active { border-color: #00AA5B; background: #E8F5EE; color: #007A41; }
+    .pay-btn .pay-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+    .wallet-balance-badge { background: #E8F5EE; color: #007A41; border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 700; display: inline-block; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <button onclick="history.back()">←</button>
+    <span style="font-size:16px;font-weight:700;">Keranjang</span>
+  </div>
+  <div id="cartContent">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/cart-page.js"></script>
+  <script src="/js/nav.js"></script>
+</body>
+</html>

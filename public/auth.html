@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Masuk - Pesanin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: var(--green); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+    .auth-card { background: white; border-radius: 24px 24px 0 0; padding: 28px 24px 40px; flex: 1; margin-top: 40px; }
+    .logo { text-align: center; color: white; padding: 24px 0 0; }
+    .logo-text { font-size: 36px; font-weight: 900; letter-spacing: -1px; }
+    .logo-sub { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+    .auth-tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 24px; }
+    .auth-tab { flex: 1; padding: 12px; text-align: center; font-size: 15px; font-weight: 700; color: #999; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .auth-tab.active { color: var(--green); border-bottom-color: var(--green); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .role-select { display: flex; gap: 10px; margin-bottom: 14px; }
+    .role-btn { flex: 1; padding: 10px; border-radius: 12px; border: 2px solid #eee; background: white; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .role-btn.active { border-color: var(--green); background: var(--green-light); color: var(--green-dark); }
+    .avatar-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .avatar-opt { font-size: 28px; cursor: pointer; padding: 6px; border-radius: 10px; border: 2px solid transparent; transition: all 0.15s; }
+    .avatar-opt.selected { border-color: var(--green); background: var(--green-light); }
+    .divider { text-align: center; color: #ccc; font-size: 12px; margin: 16px 0; }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <div class="logo-text">Pesanin</div>
+    <div class="logo-sub">Pesan makanan favoritmu</div>
+  </div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-panel="login">Masuk</button>
+      <button class="auth-tab" data-panel="register">Daftar</button>
+    </div>
+
+    <div class="panel active" id="panel-login">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="loginEmail" type="email" placeholder="email@kamu.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" id="loginBtn" onclick="doLogin()">Masuk</button>
+      <div style="text-align:center;margin-top:14px;font-size:13px;color:#777;">
+        Belum punya akun? <span style="color:var(--green);font-weight:700;cursor:pointer;" onclick="switchTab('register')">Daftar sekarang</span>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-register">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap</label>
+        <input class="form-input" id="regName" type="text" placeholder="Nama kamu" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="regEmail" type="email" placeholder="email@kamu.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">No. HP</label>
+        <input class="form-input" id="regPhone" type="tel" placeholder="08xxxxxxxxxx" autocomplete="tel">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="regPassword" type="password" placeholder="Minimal 6 karakter">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Daftar sebagai</label>
+        <div class="role-select">
+          <button class="role-btn active" data-role="customer" onclick="selectRole(this)">🛒 Customer</button>
+          <button class="role-btn" data-role="driver" onclick="selectRole(this)">🛵 Driver</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pilih Avatar</label>
+        <div class="avatar-grid" id="avatarGrid"></div>
+      </div>
+      <button class="btn-primary" id="registerBtn" onclick="doRegister()">Buat Akun</button>
+      <div style="text-align:center;margin-top:14px;font-size:13px;color:#777;">
+        Sudah punya akun? <span style="color:var(--green);font-weight:700;cursor:pointer;" onclick="switchTab('login')">Masuk</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    const AVATARS = ['😊','😎','🧑','👩','👨','🧔','👱','🙂','😄','🤩','🥳','😇'];
+    let selectedAvatar = AVATARS[0];
+    let selectedRole = 'customer';
+
+    // Redirect if already logged in
+    if (Auth.isLoggedIn()) {
+      const p = new URLSearchParams(location.search).get('redirect');
+      location.href = p || '/';
+    }
+
+    // Build avatar grid
+    const grid = document.getElementById('avatarGrid');
+    AVATARS.forEach((a, i) => {
+      const el = document.createElement('span');
+      el.className = 'avatar-opt' + (i === 0 ? ' selected' : '');
+      el.textContent = a;
+      el.onclick = () => {
+        grid.querySelectorAll('.avatar-opt').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedAvatar = a;
+      };
+      grid.appendChild(el);
+    });
+
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+      tab.addEventListener('click', () => switchTab(tab.dataset.panel));
+    });
+
+    function switchTab(name) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.panel === name));
+      document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+    }
+
+    function selectRole(btn) {
+      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedRole = btn.dataset.role;
+    }
+
+    async function doLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      if (!email || !password) { showToast('Lengkapi email dan password'); return; }
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true; btn.textContent = 'Memproses...';
+      try {
+        const res = await API.post('/auth/login', { email, password });
+        Auth.save(res.token, res.user);
+        const redirect = new URLSearchParams(location.search).get('redirect');
+        location.href = redirect || '/';
+      } catch(e) {
+        showToast(e.error || 'Login gagal');
+        btn.disabled = false; btn.textContent = 'Masuk';
+      }
+    }
+
+    async function doRegister() {
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPassword').value;
+      if (!name || !email || !password) { showToast('Lengkapi semua data'); return; }
+      const btn = document.getElementById('registerBtn');
+      btn.disabled = true; btn.textContent = 'Memproses...';
+      try {
+        const res = await API.post('/auth/register', { name, email, phone, password, role: selectedRole });
+        Auth.save(res.token, res.user);
+        const redirect = new URLSearchParams(location.search).get('redirect');
+        location.href = redirect || (selectedRole === 'driver' ? '/driver-dashboard.html' : '/');
+      } catch(e) {
+        showToast(e.error || 'Registrasi gagal');
+        btn.disabled = false; btn.textContent = 'Buat Akun';
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const activePanel = document.querySelector('.panel.active').id;
+        if (activePanel === 'panel-login') doLogin();
+        else doRegister();
+      }
+    });
+  </script>
+</body>
+</html>

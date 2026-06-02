@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Cari Driver - Pesanin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-header { background: var(--green); color: white; padding: 14px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .page-header button { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+    .driver-card { background: white; border-radius: 16px; margin: 0 16px 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .driver-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+    .vehicle-badge { display: inline-block; background: #f0f0f0; color: #555; border-radius: 20px; padding: 2px 10px; font-size: 11px; font-weight: 600; }
+    .price-tag { background: var(--green-light); color: var(--green-dark); border-radius: 10px; padding: 6px 12px; font-size: 13px; font-weight: 800; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; display: none; align-items: flex-end; }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 480px; margin: 0 auto; }
+    .modal-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+    .price-preview { background: var(--green-light); border-radius: 12px; padding: 12px 16px; margin: 12px 0; text-align: center; }
+    body { background: var(--bg); padding-bottom: 40px; }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <button onclick="history.back()">←</button>
+    <span style="font-size:16px;font-weight:700;">Driver Marketplace</span>
+    <span style="font-size:12px;opacity:0.8;margin-left:auto;">Pilih driver favoritmu</span>
+  </div>
+
+  <div style="padding:12px 16px;background:white;border-bottom:1px solid #eee;">
+    <div style="font-size:13px;color:#555;margin-bottom:8px;">💡 Pilih driver, tentukan jarak, dan bayar otomatis dari saldo dompet</div>
+    <div style="display:flex;gap:8px;">
+      <select id="vehicleFilter" class="form-input" style="font-size:13px;padding:8px 12px;" onchange="renderDrivers()">
+        <option value="">Semua Kendaraan</option>
+        <option value="motor">🛵 Motor</option>
+        <option value="mobil">🚗 Mobil</option>
+      </select>
+      <select id="sortFilter" class="form-input" style="font-size:13px;padding:8px 12px;" onchange="renderDrivers()">
+        <option value="rating">⭐ Rating</option>
+        <option value="price">💰 Termurah</option>
+        <option value="trips">🏅 Terpopuler</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="padding:12px 0 0;" id="driversList">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Book Modal -->
+  <div class="modal-overlay" id="bookModal" onclick="closeBookModal()">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-title" id="bookDriverName">Pesan Driver</div>
+      <div style="font-size:13px;color:#777;margin-bottom:16px;" id="bookDriverInfo"></div>
+      <div class="form-group">
+        <label class="form-label">Alamat Jemput</label>
+        <input class="form-input" id="bookPickup" type="text" placeholder="Dari mana?">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tujuan</label>
+        <input class="form-input" id="bookDropoff" type="text" placeholder="Mau ke mana?">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Estimasi Jarak (km)</label>
+        <input class="form-input" id="bookDistance" type="number" min="0.1" step="0.1" placeholder="1.0" oninput="updatePricePreview()">
+      </div>
+      <div class="price-preview" id="pricePreview">
+        <div style="font-size:12px;color:#555;">Estimasi Harga</div>
+        <div style="font-size:22px;font-weight:900;color:var(--green-dark);" id="pricePreviewAmt">—</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catatan (opsional)</label>
+        <input class="form-input" id="bookNotes" type="text" placeholder="Contoh: barang pecah belah">
+      </div>
+      <div style="font-size:12px;color:#777;margin-bottom:12px;">💳 Pembayaran dari saldo dompet IDR</div>
+      <button class="btn-primary" id="bookBtn" onclick="doBook()">Pesan Driver</button>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/driver-marketplace.js"></script>
+  <script src="/js/nav.js"></script>
+</body>
+</html>

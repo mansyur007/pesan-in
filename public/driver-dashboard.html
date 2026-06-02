@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Dashboard Driver - Pesanin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-header { background: #1a1a2e; color: white; padding: 14px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .page-header button { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+    .stats-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 12px 16px; background: white; border-bottom: 1px solid #eee; }
+    .stat-item { text-align: center; }
+    .stat-val { font-size: 18px; font-weight: 900; color: var(--green-dark); }
+    .stat-label { font-size: 10px; color: #999; font-weight: 600; text-transform: uppercase; }
+    .tabs { display: flex; background: white; border-bottom: 2px solid #eee; position: sticky; top: 52px; z-index: 90; }
+    .tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; background: none; border-top: none; border-left: none; border-right: none; }
+    .tab.active { color: var(--green); border-bottom-color: var(--green); }
+    .panel { display: none; padding: 12px 16px; }
+    .panel.active { display: block; }
+    .availability-toggle { display: flex; align-items: center; justify-content: space-between; background: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .toggle-switch { width: 52px; height: 28px; border-radius: 14px; border: none; cursor: pointer; transition: background 0.3s; font-size: 14px; }
+    .toggle-switch.on { background: var(--green); }
+    .toggle-switch.off { background: #ccc; }
+    .order-card { background: white; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .earnings-card { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+    body { background: var(--bg); padding-bottom: 40px; }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <button onclick="history.back()">←</button>
+    <span style="font-size:16px;font-weight:700;">Dashboard Driver</span>
+  </div>
+  <div id="statsBar" class="stats-bar">
+    <div class="stat-item"><div class="stat-val">—</div><div class="stat-label">Total Trip</div></div>
+    <div class="stat-item"><div class="stat-val">—</div><div class="stat-label">Rating</div></div>
+    <div class="stat-item"><div class="stat-val">—</div><div class="stat-label">Pendapatan</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-panel="status">Status</button>
+    <button class="tab" data-panel="orders">Pesanan</button>
+    <button class="tab" data-panel="settings">Pengaturan</button>
+  </div>
+  <div class="panel active" id="panel-status">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+  <div class="panel" id="panel-orders">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+  <div class="panel" id="panel-settings">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/driver-dashboard.js"></script>
+  <script src="/js/nav.js"></script>
+</body>
+</html>
