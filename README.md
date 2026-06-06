@@ -123,167 +123,62 @@ Halaman tracking pembeli mem-*polling* status sehingga update lintas peran tampi
 
 ## 🖼️ Tampilan Aplikasi
 
-> Ringkasan antarmuka tiap layar utama (sketsa UI). Untuk melihat versi aslinya, jalankan `npm run dev` lalu masuk dengan salah satu akun demo.
+Tangkapan layar asli dari aplikasi yang berjalan (akun demo, area Gunungpati).
 
 <table>
 <tr>
-<td width="50%" valign="top">
-
-**🛒 Beranda Pembeli** — `/buyer`
-
-```
-┌─────────────────────────────┐
-│ 📍 Antar ke  Kos Melati ▾    │
-│ ┌─────────────────────────┐ │
-│ │ 🔍 Cari warung / menu…  │ │
-│ └─────────────────────────┘ │
-│ [🍚Nasi][🍗Ayam][🍜Bakso]…  │
-│                  List │ Peta │
-│ ┌───┐ Bakso Mas Gandhi      │
-│ │▨▨ │ ★4.9 (537)            │
-│ └───┘ 🛵0.5km · ⏱10–20 mnt  │
-│ ┌───┐ Warung Bu Sri         │
-│ │▨▨ │ ★4.8 (312)            │
-│ └───┘ 🛵0.8km · Nasi · Soto │
-│ ┌─────────────────────────┐ │
-│ │ 🟧 2  Lihat Keranjang ⟶ │ │
-│ └─────────────────────────┘ │
-│   🏠 Beranda  🧾 Pesanan 👤 │
-└─────────────────────────────┘
-```
-
+<td align="center" width="33%">
+<img src="docs/screenshots/buyer-home.png" alt="Beranda pembeli" width="240"><br/>
+<b>🛒 Beranda Pembeli</b><br/>
+<sub>Search, kategori, kartu warung, banner pesanan aktif, cart FAB</sub>
 </td>
-<td width="50%" valign="top">
-
-**🧾 Checkout & Escrow** — `/cart`
-
-```
-┌─────────────────────────────┐
-│ ‹  Keranjang                │
-│ 📍 Alamat Pengantaran        │
-│ ┌─────────────────────────┐ │
-│ │ Kos Putri Melati No.7   │ │
-│ └─────────────────────────┘ │
-│ ▨ Bakso Mas Gandhi          │
-│   Bakso Urat Jumbo  −2+  36k │
-│ ─ Rincian Pembayaran ─       │
-│   Subtotal            40.000 │
-│   Ongkir (driver)      6.000 │
-│   Gas (Polygon)        1.500 │
-│   ─────────────────────────  │
-│   Total bayar         47.500 │
-│ 🔒 Dana ditahan di escrow,   │
-│    0% komisi platform.       │
-│ ┌─────────────────────────┐ │
-│ │   Pesan & Bayar         │ │
-│ └─────────────────────────┘ │
-└─────────────────────────────┘
-```
-
+<td align="center" width="33%">
+<img src="docs/screenshots/resto.png" alt="Detail resto" width="240"><br/>
+<b>🍽️ Detail Warung</b><br/>
+<sub>Menu populer, deskripsi, stepper jumlah, bar keranjang</sub>
+</td>
+<td align="center" width="33%">
+<img src="docs/screenshots/cart.png" alt="Keranjang & checkout" width="240"><br/>
+<b>🧾 Checkout & Escrow</b><br/>
+<sub>Alamat, rincian biaya, gas Polygon, catatan 0% komisi</sub>
 </td>
 </tr>
 <tr>
-<td width="50%" valign="top">
-
-**📍 Lacak Pesanan** — `/orders/[id]`
-
-```
-┌─────────────────────────────┐
-│ ‹  Lacak Pesanan            │
-│ ┌─────────────────────────┐ │
-│ │  🗺️  rute 🏪──────🏠     │ │
-│ └─────────────────────────┘ │
-│ ● Sedang berjalan            │
-│ Driver mengantar            │
-│  ✓ Menunggu konfirmasi      │
-│  ✓ Pesanan disiapkan        │
-│  ✓ Siap diambil driver      │
-│  ◉ Driver mengantar         │
-│  ○ Pesanan selesai          │
-│ ┌─────────────────────────┐ │
-│ │ 🏍️ Andi  ★4.9   📞  💬¹ │ │
-│ └─────────────────────────┘ │
-│ ⛓️ on-chain · 0xceac…74f8   │
-└─────────────────────────────┘
-```
-
+<td align="center" width="33%">
+<img src="docs/screenshots/tracking.png" alt="Lacak pesanan" width="240"><br/>
+<b>📍 Lacak Pesanan</b><br/>
+<sub>Rute jalan asli (OSRM), timeline status, kartu driver, receipt on-chain</sub>
 </td>
-<td width="50%" valign="top">
-
-**🍔 Dashboard Merchant** — `/merchant`
-
-```
-┌─────────────────────────────┐
-│ P Pesan.in · Merchant   Klr  │
-│ Warung Bu Sri  · 🟢 Buka     │
-│ ─ Menu ─        [+ Tambah]   │
-│ Nasi Rames 13k   [Tersedia]  │
-│ Soto Ayam  14k   [Tersedia]  │
-│ Gorengan    6k   [Habis]     │
-│   ⟳ tambah · edit · hapus    │
-│ ─ Pesanan Masuk ─            │
-│ #a1b2c3d4   Menunggu konfirm │
-│  1× Nasi Rames, 1× Soto      │
-│  📍 Kos Melati      Rp27.000 │
-│  ┌───────────────────────┐   │
-│  │  Terima & Siapkan     │   │
-│  └───────────────────────┘   │
-└─────────────────────────────┘
-```
-
+<td align="center" width="33%">
+<img src="docs/screenshots/merchant.png" alt="Dashboard merchant" width="240"><br/>
+<b>🍔 Dashboard Merchant</b><br/>
+<sub>Toggle toko, kelola menu (tambah/edit/hapus), pesanan masuk + aksi</sub>
 </td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-
-**🏍️ Feed Driver** — `/driver`
-
-```
-┌─────────────────────────────┐
-│ P Pesan.in · Driver     Klr  │
-│ ─ Pesanan Tersedia (2) ─    │
-│ #b2c3 · Siap        +Rp5.000 │
-│ 🏪 Warung Bu Sri            │
-│ 📍 Gedung H FMIPA Unnes     │
-│ ┌ Detail · 2 item ────────┐ │
-│ │ 1× Soto Ayam     14.000 │ │
-│ │ 1× Es Teh         4.000 │ │
-│ │ Subtotal         18.000 │ │
-│ └─────────────────────────┘ │
-│ [    Ambil Pesanan        ] │
-│ ─ Pesanan Saya (1) ─        │
-│ #d4e5 Rina  📞 💬²  [Selesai]│
-└─────────────────────────────┘
-```
-
-</td>
-<td width="50%" valign="top">
-
-**💬 Chat In-App** — pembeli ⇄ driver
-
-```
-┌─────────────────────────────┐
-│ 🏍️ Andi Saputra   ● Online ✕│
-│                             │
-│        Pesanan ditunggu ya  │
-│        ─────────────  11:12 │
-│ ┌─────────────────────┐     │
-│ │ OTW kak, 5 menit    │     │
-│ │ lagi          11:12 │     │
-│ └─────────────────────┘     │
-│        Pagar warna hijau ya │
-│        ─────────────  11:13 │
-│ ┌─────────────────────┐  ➤  │
-│ │ Tulis pesan…        │     │
-│ └─────────────────────┘     │
-└─────────────────────────────┘
-```
-
+<td align="center" width="33%">
+<img src="docs/screenshots/driver.png" alt="Feed driver" width="240"><br/>
+<b>🏍️ Feed Driver</b><br/>
+<sub>Detail item pesanan, ambil pesanan, telepon/chat pembeli</sub>
 </td>
 </tr>
 </table>
 
-> 💡 Catatan: ini sketsa ASCII agar selalu tampil di GitHub tanpa file biner. Screenshot asli bisa ditambahkan ke `docs/` dan disisipkan di sini bila diperlukan.
+<details>
+<summary>Layar lain — Riwayat & Akun</summary>
+
+<table>
+<tr>
+<td align="center" width="50%">
+<img src="docs/screenshots/orders.png" alt="Riwayat pesanan" width="240"><br/>
+<b>🧾 Pesanan</b> <sub>— semua pesanan berjalan + riwayat</sub>
+</td>
+<td align="center" width="50%">
+<img src="docs/screenshots/account.png" alt="Akun & wallet" width="240"><br/>
+<b>👤 Akun</b> <sub>— wallet, alamat, pengaturan</sub>
+</td>
+</tr>
+</table>
+
+</details>
 
 ---
 
