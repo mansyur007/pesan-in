@@ -65,7 +65,7 @@ export default function OrderTrackingClient({ initialOrder }) {
     <div className="min-h-screen bg-slate-50 pb-10">
       <BackBar title="Lacak Pesanan" back="/buyer" />
       <div className="relative">
-        <OrderMap merchant={o.merchant} />
+        <OrderMap merchant={o.merchant} dest={[o.delivery_lat, o.delivery_lng]} />
         <div className="absolute inset-x-0 bottom-0 translate-y-px bg-gradient-to-t from-slate-50 to-transparent pt-8" />
       </div>
 
