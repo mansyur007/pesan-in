@@ -108,6 +108,18 @@ function Row2({ k, v }) {
   );
 }
 
+function InfoRow({ icon, k, v }) {
+  return (
+    <div className="flex gap-2.5">
+      <span className="mt-0.5 text-base leading-none">{icon}</span>
+      <div className="min-w-0 flex-1">
+        <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{k}</dt>
+        <dd className="text-sm text-slate-700">{v}</dd>
+      </div>
+    </div>
+  );
+}
+
 /* ===================== ORDER TRACKING ===================== */
 function OrderMap({ merchant }) {
   const elRef = useRef(null);
@@ -148,37 +160,59 @@ function OrderScreen() {
   }
   const idx = STATUS_FLOW.indexOf(o.status);
   const done = o.status === 'delivered';
+  const fmtTime = (iso) => iso ? new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : null;
+  const arrival = fmtTime(o.arrivalAt);
 
   return (
     <div className="min-h-screen bg-slate-50 pb-10">
-      <BackBar title="Lacak Pesanan" onBack={() => go('/buyer')} />
+      <BackBar title="Lacak Pesanan" onBack={() => go('/buyer')} right={<span className="font-mono text-[11px] font-semibold text-slate-400">{o.orderNo}</span>} />
       <div className="relative">
         <OrderMap merchant={o.merchant} />
+        {!done && o.driverDistance && (
+          <div className="absolute left-1/2 top-3 z-[500] -translate-x-1/2 rounded-full bg-slate-900/90 px-3 py-1.5 text-xs font-semibold text-white shadow-lg backdrop-blur">
+            🛵 Driver {o.driverDistance} dari lokasimu
+          </div>
+        )}
         <div className="absolute inset-x-0 bottom-0 translate-y-px bg-gradient-to-t from-slate-50 to-transparent pt-8" />
       </div>
 
       <main className="mx-auto -mt-4 max-w-2xl space-y-4 px-4">
         {/* Status hero */}
         <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-          <div className="flex items-center gap-2">
-            {!done && <span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-60" /><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-500" /></span>}
-            <span className={`text-xs font-bold uppercase tracking-wide ${done ? 'text-emerald-600' : 'text-brand-600'}`}>{done ? '✓ Selesai' : 'Sedang berjalan'}</span>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                {!done && <span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-60" /><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-500" /></span>}
+                <span className={`text-xs font-bold uppercase tracking-wide ${done ? 'text-emerald-600' : 'text-brand-600'}`}>{done ? '✓ Selesai' : 'Sedang berjalan'}</span>
+              </div>
+              <h2 className="mt-1.5 text-xl font-extrabold">{STATUS_LABEL[o.status]}</h2>
+              <p className="text-sm text-slate-500">{o.merchant.name}</p>
+            </div>
+            {!done && (
+              <div className="shrink-0 rounded-xl bg-brand-50 px-3 py-2 text-center">
+                <div className="text-[10px] font-bold uppercase tracking-wide text-brand-500">Estimasi tiba</div>
+                <div className="text-lg font-extrabold leading-tight text-brand-700">{arrival}</div>
+                <div className="text-[11px] font-semibold text-brand-500">±{o.driverEta} menit lagi</div>
+              </div>
+            )}
           </div>
-          <h2 className="mt-1.5 text-xl font-extrabold">{STATUS_LABEL[o.status]}</h2>
-          <p className="text-sm text-slate-500">Estimasi tiba {o.merchant.eta} menit · {o.merchant.name}</p>
 
           {/* Timeline */}
           <ol className="mt-5 space-y-0">
             {STATUS_FLOW.map((s, i) => {
               const reached = i <= idx;
               const current = i === idx && !done;
+              const ts = fmtTime(o.times?.[s]);
               return (
                 <li key={s} className="flex gap-3">
                   <div className="flex flex-col items-center">
                     <span className={`grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold transition ${reached ? 'bg-brand-500 text-white' : 'bg-slate-200 text-slate-400'} ${current ? 'ring-4 ring-brand-100' : ''}`}>{reached ? '✓' : i + 1}</span>
                     {i < STATUS_FLOW.length - 1 && <span className={`my-0.5 w-0.5 flex-1 ${i < idx ? 'bg-brand-500' : 'bg-slate-200'}`} style={{ minHeight: 18 }} />}
                   </div>
-                  <div className={`pb-3 text-sm ${reached ? 'font-semibold text-slate-800' : 'text-slate-400'}`}>{STATUS_LABEL[s]}</div>
+                  <div className="flex flex-1 items-center justify-between pb-3">
+                    <span className={`text-sm ${reached ? 'font-semibold text-slate-800' : 'text-slate-400'}`}>{STATUS_LABEL[s]}</span>
+                    {ts && <span className="font-mono text-[11px] tabular-nums text-slate-400">{ts}</span>}
+                  </div>
                 </li>
               );
             })}
@@ -187,17 +221,34 @@ function OrderScreen() {
 
         {/* Driver card */}
         {o.driver && !done && (
-          <section className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-2xl">🏍️</div>
-            <div className="flex-1">
-              <div className="text-sm font-bold">{o.driver.name}</div>
-              <div className="text-xs text-slate-500">{o.driver.vehicle} · {o.driver.plate}</div>
-              <div className="mt-0.5"><Stars rating={o.driver.rating} /></div>
+          <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+            <div className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-400">
+              <span>🛵</span> Driver kamu
             </div>
-            <button className="grid h-10 w-10 place-items-center rounded-full bg-emerald-500 text-white">📞</button>
-            <button className="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-slate-600">💬</button>
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-2xl">🏍️</div>
+              <div className="flex-1">
+                <div className="text-sm font-bold">{o.driver.name}</div>
+                <div className="text-xs text-slate-500">{o.driver.vehicle} · {o.driver.plate}</div>
+                <div className="mt-0.5 flex items-center gap-2"><Stars rating={o.driver.rating} /><span className="text-[11px] text-slate-400">· {o.driver.trips?.toLocaleString('id-ID')} antar</span></div>
+              </div>
+              <button className="grid h-10 w-10 place-items-center rounded-full bg-emerald-500 text-white">📞</button>
+              <button className="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-slate-600">💬</button>
+            </div>
           </section>
         )}
+
+        {/* Delivery info */}
+        <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+          <h3 className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-400">Info Pengantaran</h3>
+          <dl className="space-y-2.5 text-sm">
+            <InfoRow icon="📍" k="Alamat" v={o.delivery_address} />
+            <InfoRow icon="👤" k="Penerima" v={o.recipient ? `${o.recipient.name} · ${o.recipient.phone}` : '—'} />
+            <InfoRow icon="🏪" k="Diambil dari" v={`${o.merchant.name} · ${o.merchant.address}`} />
+            <InfoRow icon="💳" k="Pembayaran" v={o.payment} />
+            <InfoRow icon="🧾" k="No. pesanan" v={<span className="font-mono">{o.orderNo}</span>} />
+          </dl>
+        </section>
 
         {/* Order summary */}
         <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">

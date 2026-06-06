@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import BackBar from '@/components/ui/BackBar';
 import Stars from '@/components/ui/Stars';
-import ChatPanel from '@/components/chat/ChatPanel';
+import ChatButton from '@/components/chat/ChatButton';
 import { fmtRp, STATUS_FLOW, STATUS_LABEL } from '@/lib/format';
 import { initNotifications, ensurePermission, notify } from '@/lib/notify';
 
@@ -26,7 +26,6 @@ function Row({ k, v }) {
 export default function OrderTrackingClient({ initialOrder }) {
   const router = useRouter();
   const [o, setO] = useState(initialOrder);
-  const [chatOpen, setChatOpen] = useState(false);
   const lastStatus = useRef(initialOrder.status);
   const done = o.status === 'delivered';
 
@@ -65,7 +64,7 @@ export default function OrderTrackingClient({ initialOrder }) {
     <div className="min-h-screen bg-slate-50 pb-10">
       <BackBar title="Lacak Pesanan" back="/buyer" />
       <div className="relative">
-        <OrderMap merchant={o.merchant} />
+        <OrderMap merchant={o.merchant} dest={[o.delivery_lat, o.delivery_lng]} />
         <div className="absolute inset-x-0 bottom-0 translate-y-px bg-gradient-to-t from-slate-50 to-transparent pt-8" />
       </div>
 
@@ -127,13 +126,12 @@ export default function OrderTrackingClient({ initialOrder }) {
                 📞
               </a>
             )}
-            <button
-              onClick={() => setChatOpen(true)}
-              className="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
-              aria-label="Chat driver"
-            >
-              💬
-            </button>
+            <ChatButton
+              orderId={o.id}
+              myRole="buyer"
+              peerName={o.driver.full_name}
+              peerAvatar={o.driver.avatar || '🏍️'}
+            />
           </section>
         )}
 
@@ -170,16 +168,6 @@ export default function OrderTrackingClient({ initialOrder }) {
           </button>
         )}
       </main>
-
-      {chatOpen && o.driver && (
-        <ChatPanel
-          orderId={o.id}
-          myRole="buyer"
-          peerName={o.driver.full_name}
-          peerAvatar={o.driver.avatar || '🏍️'}
-          onClose={() => setChatOpen(false)}
-        />
-      )}
     </div>
   );
 }
