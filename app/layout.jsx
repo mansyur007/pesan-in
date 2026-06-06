@@ -1,4 +1,12 @@
 import './globals.css';
+import { Plus_Jakarta_Sans } from 'next/font/google';
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-jakarta',
+  display: 'swap',
+});
 
 export const metadata = {
   title: 'Pesan.in — Delivery Makanan 0% Komisi',
@@ -13,7 +21,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id">
+    <html lang="id" className={jakarta.variable}>
       <body className="min-h-screen font-sans">{children}</body>
     </html>
   );

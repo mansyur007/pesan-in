@@ -1,15 +1,13 @@
 import Link from 'next/link';
+import Logo from '@/components/ui/Logo';
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-brand-50 via-white to-white">
+    <main className="min-h-screen bg-gradient-to-b from-peach via-white to-white">
       {/* Nav */}
       <header className="sticky top-0 z-30 border-b border-slate-100 bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-white font-bold">P</span>
-            <span className="text-lg font-bold tracking-tight">Pesan.in</span>
-          </Link>
+          <Logo />
           <nav className="flex items-center gap-2">
             <Link href="/login" className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-brand-600">
               Masuk
