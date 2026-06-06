@@ -25,7 +25,7 @@ export default function LandingPage() {
       <section className="mx-auto max-w-5xl px-4 pt-10 pb-14 sm:pt-16 sm:pb-20">
         <div className="flex flex-col items-center text-center">
           <span className="mb-4 inline-flex items-center rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
-            Khusus area Gunungpati, Semarang
+            Prototipe:Khusus area Gunungpati, Semarang
           </span>
           <h1 className="max-w-2xl text-3xl font-extrabold tracking-tight sm:text-5xl">
             Delivery makanan <span className="text-brand-500">0% komisi</span>,

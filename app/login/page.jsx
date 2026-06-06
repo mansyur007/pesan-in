@@ -3,11 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { AuthShell, Field } from '@/components/auth/AuthShell';
-
-const IS_DEMO =
-  !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 function LoginInner() {
   const router = useRouter();
@@ -22,34 +18,19 @@ function LoginInner() {
     setLoading(true);
     setError(null);
 
-    if (IS_DEMO) {
-      const res = await fetch('/api/demo-auth', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action: 'login', email, password }),
-      });
-      const data = await res.json();
-      if (!data.ok) {
-        setError(data.error || 'Login gagal.');
-        setLoading(false);
-        return;
-      }
-      router.push(params.get('next') || data.redirect);
-      router.refresh();
-      return;
-    }
-
-    const supabase = createClient();
-    const { error: signErr } = await supabase.auth.signInWithPassword({ email, password });
-    if (signErr) {
-      setError(signErr.message);
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'login', email, password }),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      setError(data.error || 'Login gagal.');
       setLoading(false);
       return;
     }
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data: profile } = await supabase
-      .from('profiles').select('role').eq('id', user.id).single();
-    router.push(params.get('next') || roleHome(profile?.role));
+    router.push(params.get('next') || data.redirect);
+    router.refresh();
   }
 
   function useDemo(role) {
@@ -59,24 +40,22 @@ function LoginInner() {
 
   return (
     <AuthShell title="Masuk ke Pesanin">
-      {IS_DEMO && (
-        <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-          <p className="font-semibold">Mode Demo (Supabase belum dikonfigurasi)</p>
-          <p className="mt-1">Klik untuk isi otomatis:</p>
-          <div className="mt-2 flex gap-2">
-            {['merchant', 'buyer', 'driver'].map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => useDemo(r)}
-                className="rounded-md bg-white px-2 py-1 font-medium text-amber-800 ring-1 ring-amber-200 hover:bg-amber-100"
-              >
-                {r}
-              </button>
-            ))}
-          </div>
+      <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+        <p className="font-semibold">Akun demo (DB lokal)</p>
+        <p className="mt-1">Klik untuk isi otomatis · password <code>demo123</code>:</p>
+        <div className="mt-2 flex gap-2">
+          {['merchant', 'buyer', 'driver'].map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => useDemo(r)}
+              className="rounded-md bg-white px-2 py-1 font-medium text-amber-800 ring-1 ring-amber-200 hover:bg-amber-100"
+            >
+              {r}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <Field label="Email" type="email" value={email} onChange={setEmail} required />
@@ -96,12 +75,6 @@ function LoginInner() {
       </p>
     </AuthShell>
   );
-}
-
-function roleHome(role) {
-  if (role === 'merchant') return '/merchant';
-  if (role === 'driver') return '/driver';
-  return '/buyer';
 }
 
 export default function LoginPage() {

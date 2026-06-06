@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { AuthShell, Field } from '@/components/auth/AuthShell';
 
 const ROLES = [
@@ -24,7 +23,6 @@ function RegisterInner() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [info, setInfo] = useState(null);
 
   useEffect(() => {
     const q = params.get('role');
@@ -35,30 +33,20 @@ function RegisterInner() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setInfo(null);
-    const supabase = createClient();
-    const { data, error: signErr } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { role, full_name: fullName } },
+
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'register', fullName, email, phone, password, role }),
     });
-    if (signErr) {
-      setError(signErr.message);
+    const data = await res.json();
+    if (!data.ok) {
+      setError(data.error || 'Pendaftaran gagal.');
       setLoading(false);
       return;
     }
-
-    if (data.user && phone) {
-      await supabase.from('profiles').update({ phone }).eq('id', data.user.id);
-    }
-
-    if (!data.session) {
-      setInfo('Cek email untuk verifikasi akun sebelum login.');
-      setLoading(false);
-      return;
-    }
-
-    router.push(role === 'merchant' ? '/merchant' : role === 'driver' ? '/driver' : '/buyer');
+    router.push(data.redirect);
+    router.refresh();
   }
 
   return (
@@ -87,7 +75,6 @@ function RegisterInner() {
         <Field label="Nomor HP" type="tel" value={phone} onChange={setPhone} placeholder="08xx" />
         <Field label="Password" type="password" value={password} onChange={setPassword} required />
         {error && <p className="text-sm text-red-600">{error}</p>}
-        {info && <p className="text-sm text-emerald-700">{info}</p>}
         <button
           type="submit"
           disabled={loading}
