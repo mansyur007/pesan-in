@@ -14,9 +14,16 @@ module.exports = {
           600: '#ea580c',
           700: '#c2410c',
         },
+        // Palet brand resmi Pesan.in
+        ink: {
+          DEFAULT: '#211A14',
+          soft: '#6B5F54',
+        },
+        peach: '#FFF1E6',
+        paper: '#FFFBF7',
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-jakarta)', 'Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

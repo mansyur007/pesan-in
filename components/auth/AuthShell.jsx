@@ -1,13 +1,10 @@
-import Link from 'next/link';
+import Logo from '@/components/ui/Logo';
 
 export function AuthShell({ title, children }) {
   return (
-    <main className="grid min-h-screen place-items-center bg-brand-50 px-4 py-10">
+    <main className="grid min-h-screen place-items-center bg-peach px-4 py-10">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg sm:p-8">
-        <Link href="/" className="mb-6 inline-flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-white font-bold">P</span>
-          <span className="text-lg font-bold">Pesan.in</span>
-        </Link>
+        <div className="mb-6 inline-flex"><Logo /></div>
         <h1 className="mb-6 text-2xl font-extrabold tracking-tight">{title}</h1>
         {children}
       </div>
