@@ -10,7 +10,9 @@ function CurrentScreen() {
     case '/order':    return <OrderScreen />;
     case '/orders':   return <OrdersScreen />;
     case '/account':  return <AccountScreen />;
-    case '/merchant': return <MerchantDashboard />;
+    case '/merchant':       return <MerchantOrders />;
+    case '/merchant/menu':  return <MerchantMenu />;
+    case '/merchant/store': return <MerchantStore />;
     case '/driver':   return <DriverDashboard />;
     default:          return <LandingPage />;
   }
@@ -30,8 +32,12 @@ const NAV_GROUPS = [
     { path: '/orders',  label: 'Riwayat' },
     { path: '/account', label: 'Akun' },
   ]},
-  { title: 'Mitra', items: [
-    { path: '/merchant', label: 'Merchant' },
+  { title: 'Mitra Merchant', items: [
+    { path: '/merchant',       label: 'Pesanan' },
+    { path: '/merchant/menu',  label: 'Menu' },
+    { path: '/merchant/store', label: 'Toko' },
+  ]},
+  { title: 'Mitra Driver', items: [
     { path: '/driver',   label: 'Driver' },
   ]},
 ];
@@ -81,8 +87,10 @@ function App() {
   return (
     <RouterProvider>
       <CartProvider>
-        <CurrentScreen />
-        <ProtoNav />
+        <MerchantProvider>
+          <CurrentScreen />
+          <ProtoNav />
+        </MerchantProvider>
       </CartProvider>
     </RouterProvider>
   );
