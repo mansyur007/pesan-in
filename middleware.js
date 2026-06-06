@@ -1,51 +1,19 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
-import { DEMO_COOKIE } from '@/lib/auth/demo';
+import { SESSION_COOKIE } from '@/lib/auth/constants';
 
-const PROTECTED = ['/merchant', '/buyer', '/driver'];
+const PROTECTED = ['/merchant', '/buyer', '/driver', '/resto', '/cart', '/orders', '/account'];
 
-export async function middleware(request) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+export function middleware(request) {
+  const { pathname } = request.nextUrl;
+  const needsAuth = PROTECTED.some((p) => pathname === p || pathname.startsWith(p + '/'));
 
-  const needsAuth = PROTECTED.some((p) => request.nextUrl.pathname.startsWith(p));
-
-  // Demo mode: cek cookie demo.
-  if (!url || !anon) {
-    if (needsAuth && !request.cookies.get(DEMO_COOKIE)) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = '/login';
-      redirectUrl.searchParams.set('next', request.nextUrl.pathname);
-      return NextResponse.redirect(redirectUrl);
-    }
-    return NextResponse.next({ request });
-  }
-
-  // Supabase mode.
-  let response = NextResponse.next({ request });
-  const supabase = createServerClient(url, anon, {
-    cookies: {
-      getAll() { return request.cookies.getAll(); },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
-        );
-      },
-    },
-  });
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (needsAuth && !user) {
+  if (needsAuth && !request.cookies.get(SESSION_COOKIE)) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = '/login';
-    redirectUrl.searchParams.set('next', request.nextUrl.pathname);
+    redirectUrl.searchParams.set('next', pathname);
     return NextResponse.redirect(redirectUrl);
   }
-
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
