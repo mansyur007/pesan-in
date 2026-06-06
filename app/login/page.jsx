@@ -39,7 +39,7 @@ function LoginInner() {
   }
 
   return (
-    <AuthShell title="Masuk ke Pesanin">
+    <AuthShell title="Masuk ke Pesan.in">
       <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
         <p className="font-semibold">Akun demo (DB lokal)</p>
         <p className="mt-1">Klik untuk isi otomatis · password <code>demo123</code>:</p>
