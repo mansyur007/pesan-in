@@ -6,11 +6,11 @@ export default function Logo({ sub, href = '/' }) {
       <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 font-bold text-white">P</span>
       {sub ? (
         <div>
-          <div className="text-sm font-bold leading-tight">Pesanin</div>
+          <div className="text-sm font-bold leading-tight">Pesan.in</div>
           <div className="text-[10px] uppercase tracking-wider text-slate-500">{sub}</div>
         </div>
       ) : (
-        <span className="text-lg font-bold tracking-tight">Pesanin</span>
+        <span className="text-lg font-bold tracking-tight">Pesan.in</span>
       )}
     </Link>
   );

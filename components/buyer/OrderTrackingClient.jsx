@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import BackBar from '@/components/ui/BackBar';
 import Stars from '@/components/ui/Stars';
+import ChatPanel from '@/components/chat/ChatPanel';
 import { fmtRp, STATUS_FLOW, STATUS_LABEL } from '@/lib/format';
+import { initNotifications, ensurePermission, notify } from '@/lib/notify';
 
 const OrderMap = dynamic(() => import('@/components/maps/OrderMap'), {
   ssr: false,
@@ -24,16 +26,34 @@ function Row({ k, v }) {
 export default function OrderTrackingClient({ initialOrder }) {
   const router = useRouter();
   const [o, setO] = useState(initialOrder);
+  const [chatOpen, setChatOpen] = useState(false);
+  const lastStatus = useRef(initialOrder.status);
   const done = o.status === 'delivered';
 
-  // Poll status sampai selesai.
+  // Aktifkan notifikasi saat halaman tracking dibuka.
+  useEffect(() => {
+    initNotifications();
+    ensurePermission();
+  }, []);
+
+  // Poll status sampai selesai; kirim notifikasi tiap status berubah.
   useEffect(() => {
     if (done) return;
     const t = setInterval(async () => {
       try {
         const res = await fetch(`/api/orders/${o.id}`, { cache: 'no-store' });
         const data = await res.json();
-        if (data.ok) setO(data.order);
+        if (data.ok) {
+          if (data.order.status !== lastStatus.current) {
+            lastStatus.current = data.order.status;
+            notify('Pesan.in — Update pesanan', {
+              body: `${STATUS_LABEL[data.order.status]} · ${data.order.merchant?.name || ''}`,
+              data: { url: `/orders/${data.order.id}` },
+              tag: `order-${data.order.id}`,
+            });
+          }
+          setO(data.order);
+        }
       } catch {}
     }, 4000);
     return () => clearInterval(t);
@@ -95,11 +115,25 @@ export default function OrderTrackingClient({ initialOrder }) {
             <div className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-2xl">{o.driver.avatar || '🏍️'}</div>
             <div className="flex-1">
               <div className="text-sm font-bold">{o.driver.full_name}</div>
-              <div className="text-xs text-slate-500">Driver Pesanin {o.driver.phone ? `· ${o.driver.phone}` : ''}</div>
+              <div className="text-xs text-slate-500">Driver Pesan.in {o.driver.phone ? `· ${o.driver.phone}` : ''}</div>
               <div className="mt-0.5"><Stars rating={4.9} /></div>
             </div>
-            <button className="grid h-10 w-10 place-items-center rounded-full bg-emerald-500 text-white">📞</button>
-            <button className="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-slate-600">💬</button>
+            {o.driver.phone && (
+              <a
+                href={`tel:${o.driver.phone.replace(/[^0-9+]/g, '')}`}
+                className="grid h-10 w-10 place-items-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+                aria-label="Telepon driver"
+              >
+                📞
+              </a>
+            )}
+            <button
+              onClick={() => setChatOpen(true)}
+              className="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+              aria-label="Chat driver"
+            >
+              💬
+            </button>
           </section>
         )}
 
@@ -136,6 +170,16 @@ export default function OrderTrackingClient({ initialOrder }) {
           </button>
         )}
       </main>
+
+      {chatOpen && o.driver && (
+        <ChatPanel
+          orderId={o.id}
+          myRole="buyer"
+          peerName={o.driver.full_name}
+          peerAvatar={o.driver.avatar || '🏍️'}
+          onClose={() => setChatOpen(false)}
+        />
+      )}
     </div>
   );
 }

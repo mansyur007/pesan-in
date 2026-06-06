@@ -50,7 +50,7 @@ function RegisterInner() {
   }
 
   return (
-    <AuthShell title="Daftar Pesanin">
+    <AuthShell title="Daftar Pesan.in">
       <div className="mb-5 grid grid-cols-3 gap-2">
         {ROLES.map((r) => (
           <button

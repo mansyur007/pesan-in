@@ -8,7 +8,7 @@ export default function TopBar({ user, title }) {
         <Link href="/" className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-white font-bold">P</span>
           <div>
-            <div className="text-sm font-bold leading-tight">Pesanin</div>
+            <div className="text-sm font-bold leading-tight">Pesan.in</div>
             <div className="text-[10px] uppercase tracking-wider text-slate-500">{title}</div>
           </div>
         </Link>

@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ChatPanel from '@/components/chat/ChatPanel';
 import { fmtRp, STATUS_LABEL } from '@/lib/format';
 
 export default function DriverOrdersList({ available, mine }) {
   const router = useRouter();
   const [busy, setBusy] = useState(null);
+  const [chatOrder, setChatOrder] = useState(null);
 
   async function call(action, orderId) {
     setBusy(orderId);
@@ -80,22 +82,53 @@ export default function DriverOrdersList({ available, mine }) {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="text-sm font-semibold">#{o.id.slice(0, 8)}</div>
+                    <div className="mt-0.5 text-xs text-slate-600">{o.buyer?.full_name}</div>
                     <div className="mt-1 text-xs text-slate-600">📍 {o.delivery_address}</div>
                     <div className="mt-1 text-xs text-brand-600">{STATUS_LABEL[o.status]}</div>
                   </div>
-                  <button
-                    disabled={busy === o.id}
-                    onClick={() => completeOrder(o.id)}
-                    className="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
-                  >
-                    {busy === o.id ? 'Menyelesaikan…' : 'Tandai Selesai'}
-                  </button>
+                  <div className="flex shrink-0 flex-col items-end gap-2">
+                    <div className="flex gap-2">
+                      {o.buyer?.phone && (
+                        <a
+                          href={`tel:${o.buyer.phone.replace(/[^0-9+]/g, '')}`}
+                          className="grid h-8 w-8 place-items-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+                          aria-label="Telepon pembeli"
+                        >
+                          📞
+                        </a>
+                      )}
+                      <button
+                        onClick={() => setChatOrder(o)}
+                        className="grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        aria-label="Chat pembeli"
+                      >
+                        💬
+                      </button>
+                    </div>
+                    <button
+                      disabled={busy === o.id}
+                      onClick={() => completeOrder(o.id)}
+                      className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                    >
+                      {busy === o.id ? 'Menyelesaikan…' : 'Tandai Selesai'}
+                    </button>
+                  </div>
                 </div>
               </li>
             ))}
           </ul>
         )}
       </section>
+
+      {chatOrder && (
+        <ChatPanel
+          orderId={chatOrder.id}
+          myRole="driver"
+          peerName={chatOrder.buyer?.full_name || 'Pembeli'}
+          peerAvatar={chatOrder.buyer?.avatar || '🙂'}
+          onClose={() => setChatOrder(null)}
+        />
+      )}
     </div>
   );
 }
