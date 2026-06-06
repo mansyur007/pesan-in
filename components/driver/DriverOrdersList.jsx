@@ -9,6 +9,16 @@ function itemSummary(items = []) {
   return items.map((i) => `${i.qty}× ${i.name}`).join(', ');
 }
 
+// Deep-link ke aplikasi peta HP (Google/Apple Maps) untuk navigasi turn-by-turn.
+// Pakai koordinat tujuan bila ada, jika tidak fallback ke teks alamat.
+function navUrl(o) {
+  const dest =
+    o.delivery_lat != null && o.delivery_lng != null
+      ? `${o.delivery_lat},${o.delivery_lng}`
+      : encodeURIComponent(o.delivery_address || '');
+  return `https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`;
+}
+
 function AvailableRow({ o, busy, onAccept }) {
   const itemCount = (o.items || []).reduce((a, i) => a + i.qty, 0);
   return (
@@ -73,33 +83,43 @@ function MineRow({ o, busy, onComplete }) {
           <p className="mt-1 truncate text-[11px] text-slate-400">{itemSummary(o.items)}</p>
           <div className="mt-1 text-xs text-brand-600">{STATUS_LABEL[o.status]}</div>
         </div>
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <div className="flex gap-2">
-            {o.buyer?.phone && (
-              <a
-                href={`tel:${o.buyer.phone.replace(/[^0-9+]/g, '')}`}
-                className="grid h-8 w-8 place-items-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
-                aria-label="Telepon pembeli"
-              >
-                📞
-              </a>
-            )}
-            <ChatButton
-              orderId={o.id}
-              myRole="driver"
-              peerName={o.buyer?.full_name || 'Pembeli'}
-              peerAvatar={o.buyer?.avatar || '🙂'}
-              className="grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
-            />
-          </div>
-          <button
-            disabled={busy}
-            onClick={() => onComplete(o.id)}
-            className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
-          >
-            {busy ? 'Menyelesaikan…' : 'Tandai Selesai'}
-          </button>
+        <div className="flex shrink-0 gap-2">
+          {o.buyer?.phone && (
+            <a
+              href={`tel:${o.buyer.phone.replace(/[^0-9+]/g, '')}`}
+              className="grid h-8 w-8 place-items-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+              aria-label="Telepon pembeli"
+            >
+              📞
+            </a>
+          )}
+          <ChatButton
+            orderId={o.id}
+            myRole="driver"
+            peerName={o.buyer?.full_name || 'Pembeli'}
+            peerAvatar={o.buyer?.avatar || '🙂'}
+            className="grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+          />
         </div>
+      </div>
+
+      {/* Aksi pengantaran */}
+      <div className="mt-3 flex gap-2">
+        <a
+          href={navUrl(o)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 py-2.5 text-xs font-bold text-white hover:bg-blue-700"
+        >
+          🧭 Navigasi
+        </a>
+        <button
+          disabled={busy}
+          onClick={() => onComplete(o.id)}
+          className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+        >
+          {busy ? 'Menyelesaikan…' : 'Tandai Selesai'}
+        </button>
       </div>
     </li>
   );
