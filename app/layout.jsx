@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Pesanin — Delivery Makanan 0% Komisi',
+  title: 'Pesan.in — Delivery Makanan 0% Komisi',
   description: 'MVP food delivery untuk area Gunungpati, Semarang. Transaksi on-chain via Polygon.',
 };
 

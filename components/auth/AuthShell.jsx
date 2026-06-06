@@ -6,7 +6,7 @@ export function AuthShell({ title, children }) {
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg sm:p-8">
         <Link href="/" className="mb-6 inline-flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-white font-bold">P</span>
-          <span className="text-lg font-bold">Pesanin</span>
+          <span className="text-lg font-bold">Pesan.in</span>
         </Link>
         <h1 className="mb-6 text-2xl font-extrabold tracking-tight">{title}</h1>
         {children}

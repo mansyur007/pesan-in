@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🍔 Pesanin
+# 🍔 Pesan.in
 
 ### Delivery makanan **0% komisi**, transparan di blockchain — khusus Gunungpati, Semarang.
 
@@ -18,9 +18,9 @@ Harga ke merchant, ongkir ke driver — **langsung, tanpa potongan platform**. S
 
 ---
 
-## ✨ Kenapa Pesanin?
+## ✨ Kenapa Pesan.in?
 
-Aplikasi food-delivery konvensional memotong 20–30% dari setiap transaksi. **Pesanin menghapus potongan itu.** Pembeli bayar sekali (makanan + ongkir + biaya jaringan), dana ditahan di *smart contract escrow*, lalu dirilis otomatis ke merchant & driver saat pesanan selesai.
+Aplikasi food-delivery konvensional memotong 20–30% dari setiap transaksi. **Pesan.in menghapus potongan itu.** Pembeli bayar sekali (makanan + ongkir + biaya jaringan), dana ditahan di *smart contract escrow*, lalu dirilis otomatis ke merchant & driver saat pesanan selesai.
 
 > 🎯 **MVP fokus area Gunungpati, Semarang** — ekosistem tiga peran dalam satu aplikasi.
 
@@ -89,15 +89,18 @@ Halaman tracking pembeli mem-*polling* status sehingga update lintas peran tampi
 - Detail resto + menu populer
 - Keranjang persisten (localStorage)
 - Checkout: rincian escrow + biaya gas
-- **Tracking**: peta rute, timeline, kartu driver, receipt on-chain
+- **Tracking**: peta rute, timeline, receipt on-chain
+- 📞 **Telepon & 💬 chat driver** in-app
+- 🔔 **Notifikasi** tiap status pesanan berubah
 - Riwayat pesanan & halaman akun + wallet
 
 </td>
 <td width="33%" valign="top">
 
 ### 🍔 Merchant
-- Dashboard toko & status buka/tutup
-- Daftar menu + ketersediaan
+- 🔀 **Toggle buka/tutup toko**
+- 🧑‍🍳 **Kelola menu mandiri** — tambah, edit, hapus
+- Tandai menu *habis* / *populer*
 - **Pesanan masuk** real-time
 - Aksi: *Terima & Siapkan* → *Siap Diambil*
 - Pembayaran langsung ke wallet
@@ -108,7 +111,7 @@ Halaman tracking pembeli mem-*polling* status sehingga update lintas peran tampi
 ### 🏍️ Driver
 - Feed **pesanan tersedia** sekitar
 - Ambil pesanan satu klik
-- Daftar **pesanan saya**
+- 📞 Telepon & 💬 chat pembeli in-app
 - Selesaikan → *settle* on-chain (mock tx)
 - Ongkir masuk wallet otomatis
 
@@ -135,13 +138,16 @@ app/
 ├─ login/ · register/      # Auth
 └─ api/
    ├─ auth/                # login · register · logout (cookie session)
-   └─ orders/              # buat order + aksi status merchant/driver
+   ├─ merchant/            # kelola menu + buka/tutup toko
+   └─ orders/              # buat order, aksi status, & chat per pesanan
 
-components/                # ui · buyer · merchant · driver · maps · layout
+components/                # ui · buyer · merchant · driver · chat · maps · layout
 lib/
 ├─ db/                     # schema + seed, query, users (SQLite lokal)
 ├─ auth/                   # session & konstanta (edge-safe)
+├─ notify.js               # notifikasi status (service worker + Web Notifications)
 └─ format.js               # util format Rupiah, label status, biaya
+public/sw.js               # service worker notifikasi
 ```
 
 **Catatan desain:**
@@ -165,18 +171,19 @@ lib/
 
 ## 🗺️ Roadmap
 
+- [x] 📞💬 Telepon & chat driver in-app
+- [x] 🔔 Notifikasi status pesanan
+- [x] 🧑‍🍳 Manajemen menu mandiri untuk merchant
 - [ ] Integrasi smart contract escrow Polygon sungguhan (kini mock tx hash)
 - [ ] Wallet & Top Up nyata (saldo MATIC)
-- [ ] Telepon/chat driver in-app
-- [ ] Notifikasi push status pesanan
-- [ ] Manajemen menu mandiri untuk merchant
+- [ ] Web Push sungguhan (VAPID + server push, kini notifikasi via polling client)
 - [ ] Perluasan area di luar Gunungpati
 
 ---
 
 <div align="center">
 
-**Pesanin** — MVP food delivery 0% komisi · Gunungpati, Semarang 🧡
+**Pesan.in** — MVP food delivery 0% komisi · Gunungpati, Semarang 🧡
 
 <sub>Dibangun dengan Next.js + SQLite lokal. Referensi UI: <code>pesanin-mockup/</code></sub>
 

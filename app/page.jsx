@@ -8,7 +8,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-2">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-white font-bold">P</span>
-            <span className="text-lg font-bold tracking-tight">Pesanin</span>
+            <span className="text-lg font-bold tracking-tight">Pesan.in</span>
           </Link>
           <nav className="flex items-center gap-2">
             <Link href="/login" className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-brand-600">
@@ -85,7 +85,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-slate-100 py-8">
         <div className="mx-auto max-w-5xl px-4 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} Pesanin. MVP — Gunungpati, Semarang.
+          © {new Date().getFullYear()} Pesan.in. MVP — Gunungpati, Semarang.
         </div>
       </footer>
     </main>
