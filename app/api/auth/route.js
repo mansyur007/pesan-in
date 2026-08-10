@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server';
 import { verifyLogin, createUser } from '@/lib/db/users';
-import { SESSION_COOKIE, SESSION_MAX_AGE, roleHome } from '@/lib/auth/session';
+import { SESSION_COOKIE, SESSION_MAX_AGE, roleHome, createSessionToken } from '@/lib/auth/session';
+import { ROLES } from '@/lib/auth/constants';
 
 export const runtime = 'nodejs';
 
 function setSession(res, userId) {
-  res.cookies.set(SESSION_COOKIE, userId, {
+  res.cookies.set(SESSION_COOKIE, createSessionToken(userId), {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
     maxAge: SESSION_MAX_AGE,
+    secure: process.env.NODE_ENV === 'production',
   });
 }
 
@@ -42,6 +44,9 @@ export async function POST(req) {
     const { fullName, email, phone, password, role } = body;
     if (!fullName || !email || !password) {
       return NextResponse.json({ ok: false, error: 'Lengkapi semua isian wajib.' }, { status: 400 });
+    }
+    if (role != null && !ROLES.includes(role)) {
+      return NextResponse.json({ ok: false, error: 'Role tidak valid.' }, { status: 400 });
     }
     const result = createUser({ fullName, email, phone, password, role: role || 'buyer' });
     if (!result.ok) {

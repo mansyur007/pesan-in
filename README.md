@@ -214,6 +214,8 @@ public/sw.js               # service worker notifikasi
 **Catatan desain:**
 - 🗄️ **Data lokal** — semua persistensi lewat `better-sqlite3` (`app.db`), di-seed dari data Gunungpati. Tanpa layanan eksternal.
 - 🔒 **Harga divalidasi server** — endpoint order tidak mempercayai harga dari client; selalu cek ulang ke DB.
+- 🍪 **Session bertanda tangan** — cookie berisi `<user id>.<HMAC-SHA256>`; tanpa tanda tangan yang cocok cookie ditolak. Secret dari `SESSION_SECRET`, atau dibuat acak sekali & disimpan di `app.db` bila env kosong.
+- 🙈 **Detail pesanan tertutup** — alamat & nomor HP hanya bisa dilihat pembeli, driver yang mengambil, dan pemilik toko terkait.
 - ⚡ **Edge-safe middleware** — konstanta auth dipisah agar middleware tak menarik modul native.
 - 💰 **0% komisi** — total bayar = subtotal + ongkir + biaya jaringan; tidak ada potongan platform.
 

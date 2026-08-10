@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
-import { getOrder } from '@/lib/db/queries';
+import { getOrder, canViewOrder } from '@/lib/db/queries';
 
 export const runtime = 'nodejs';
 
@@ -9,5 +9,8 @@ export async function GET(_req, { params }) {
   if (!user) return NextResponse.json({ ok: false, error: 'Belum login.' }, { status: 401 });
   const order = getOrder(params.id);
   if (!order) return NextResponse.json({ ok: false, error: 'Tidak ditemukan.' }, { status: 404 });
+  if (!canViewOrder(order, user)) {
+    return NextResponse.json({ ok: false, error: 'Tidak punya akses.' }, { status: 403 });
+  }
   return NextResponse.json({ ok: true, order });
 }
