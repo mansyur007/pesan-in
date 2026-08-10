@@ -49,7 +49,7 @@ export default async function OrdersScreen() {
         <section>
           <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">Riwayat</h2>
           {history.length === 0 ? (
-            <p className="py-10 text-center text-sm text-slate-400">Belum ada pesanan selesai.</p>
+            <p className="py-10 text-center text-sm text-slate-400">Belum ada riwayat pesanan.</p>
           ) : (
             <ul className="space-y-3">
               {history.map((h) => (
@@ -58,7 +58,11 @@ export default async function OrdersScreen() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="truncate font-bold">{h.merchant?.name || 'Merchant'}</span>
-                      <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">Selesai</span>
+                      {h.status === 'rejected' ? (
+                        <span className="shrink-0 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-600">Ditolak</span>
+                      ) : (
+                        <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">Selesai</span>
+                      )}
                     </div>
                     <p className="mt-0.5 truncate text-xs text-slate-500">
                       {h.items.map((i) => `${i.qty}× ${i.name}`).join(', ')}
