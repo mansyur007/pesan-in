@@ -28,6 +28,8 @@ export default function OrderTrackingClient({ initialOrder }) {
   const [o, setO] = useState(initialOrder);
   const lastStatus = useRef(initialOrder.status);
   const done = o.status === 'delivered';
+  const rejected = o.status === 'rejected';
+  const closed = done || rejected;
 
   // Aktifkan notifikasi saat halaman tracking dibuka.
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function OrderTrackingClient({ initialOrder }) {
 
   // Poll status sampai selesai; kirim notifikasi tiap status berubah.
   useEffect(() => {
-    if (done) return;
+    if (closed) return;
     const t = setInterval(async () => {
       try {
         const res = await fetch(`/api/orders/${o.id}`, { cache: 'no-store' });
@@ -56,7 +58,7 @@ export default function OrderTrackingClient({ initialOrder }) {
       } catch {}
     }, 4000);
     return () => clearInterval(t);
-  }, [o.id, done]);
+  }, [o.id, closed]);
 
   const idx = STATUS_FLOW.indexOf(o.status);
 
@@ -71,22 +73,29 @@ export default function OrderTrackingClient({ initialOrder }) {
       <main className="mx-auto -mt-4 max-w-2xl space-y-4 px-4">
         <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
           <div className="flex items-center gap-2">
-            {!done && (
+            {!closed && (
               <span className="relative flex h-2.5 w-2.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-60" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-500" />
               </span>
             )}
-            <span className={`text-xs font-bold uppercase tracking-wide ${done ? 'text-emerald-600' : 'text-brand-600'}`}>
-              {done ? '✓ Selesai' : 'Sedang berjalan'}
+            <span
+              className={`text-xs font-bold uppercase tracking-wide ${
+                rejected ? 'text-red-600' : done ? 'text-emerald-600' : 'text-brand-600'
+              }`}
+            >
+              {rejected ? '✕ Dibatalkan' : done ? '✓ Selesai' : 'Sedang berjalan'}
             </span>
           </div>
           <h2 className="mt-1.5 text-xl font-extrabold">{STATUS_LABEL[o.status]}</h2>
           <p className="text-sm text-slate-500">
-            Estimasi tiba {o.merchant?.eta} menit · {o.merchant?.name}
+            {rejected
+              ? `${o.merchant?.name} tidak bisa memproses pesanan ini`
+              : `Estimasi tiba ${o.merchant?.eta} menit · ${o.merchant?.name}`}
           </p>
 
-          <ol className="mt-5 space-y-0">
+          {/* Pesanan ditolak keluar dari alur normal, jadi timeline tidak relevan. */}
+          <ol className={`mt-5 space-y-0 ${rejected ? 'hidden' : ''}`}>
             {STATUS_FLOW.map((s, i) => {
               const reached = i <= idx;
               const current = i === idx && !done;

@@ -98,11 +98,12 @@ Halaman tracking pembeli mem-*polling* status sehingga update lintas peran tampi
 <td width="33%" valign="top">
 
 ### 🍔 Merchant
-- 🔀 **Toggle buka/tutup toko**
+- 🏪 **3 halaman + bottom-tab** — Pesanan · Menu · Toko
+- Filter pesanan: *Baru · Diproses · Siap · Selesai · Ditolak*
+- Aksi: **Terima** / **Tolak** → *Siap Diambil*
 - 🧑‍🍳 **Kelola menu mandiri** — tambah, edit, hapus
 - Tandai menu *habis* / *populer*
-- **Pesanan masuk** real-time
-- Aksi: *Terima & Siapkan* → *Siap Diambil*
+- 🔀 **Toggle buka/tutup toko** + statistik harian
 - Pembayaran langsung ke wallet
 
 </td>
@@ -237,7 +238,7 @@ public/sw.js               # service worker notifikasi
 - [x] 📞💬 Telepon & chat driver in-app
 - [x] 🔔 Notifikasi status pesanan
 - [x] 🧑‍🍳 Manajemen menu mandiri untuk merchant
-- [ ] 🏪 **Redesign merchant gaya GoBiz** — 3 halaman terpisah (Pesanan · Menu · Toko) dengan bottom-tab, filter status pesanan, tombol terima/tolak, & statistik toko (pesanan & pendapatan harian). Referensi: `pesanin-mockup/pesanin/merchant.jsx`
+- [x] 🏪 **Redesign merchant gaya GoBiz** — 3 halaman terpisah (Pesanan · Menu · Toko) dengan bottom-tab, filter status pesanan, tombol terima/tolak, & statistik toko (pesanan & pendapatan harian). Referensi: `pesanin-mockup/pesanin/merchant.jsx`
 - [ ] Integrasi smart contract escrow Polygon sungguhan (kini mock tx hash)
 - [ ] Wallet & Top Up nyata (saldo MATIC)
 - [ ] Web Push sungguhan (VAPID + server push, kini notifikasi via polling client)

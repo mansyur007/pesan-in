@@ -4,6 +4,7 @@ import { getMerchant, getMerchantByOwner, getMenu } from '@/lib/db/queries';
 import {
   createOrder,
   advanceOrderStatus,
+  rejectOrder,
   driverAccept,
   driverComplete,
 } from '@/lib/db/queries';
@@ -67,6 +68,15 @@ export async function POST(req) {
       return NextResponse.json({ ok: false, error: 'Status tidak valid.' }, { status: 400 });
     }
     const result = advanceOrderStatus(orderId, status, { merchantId: merchant.id });
+    return NextResponse.json(result, { status: result.ok ? 200 : 400 });
+  }
+
+  // ---- Merchant: tolak pesanan ----
+  if (action === 'merchant-reject') {
+    if (user.role !== 'merchant') return NextResponse.json({ ok: false, error: 'Bukan merchant.' }, { status: 403 });
+    const merchant = getMerchantByOwner(user.id);
+    if (!merchant) return NextResponse.json({ ok: false, error: 'Toko tidak ditemukan.' }, { status: 404 });
+    const result = rejectOrder(body.orderId, merchant.id);
     return NextResponse.json(result, { status: result.ok ? 200 : 400 });
   }
 
