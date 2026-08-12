@@ -1,11 +1,15 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { unsubscribeFromPush } from '@/lib/notify';
 
 export default function LogoutButton({ className }) {
   const router = useRouter();
 
   async function logout() {
+    // Lepas dulu selagi masih tahu identitas device — unsubscribe butuh endpoint
+    // dari service worker, bukan sesi server yang segera hilang setelah logout.
+    await unsubscribeFromPush();
     await fetch('/api/auth', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
