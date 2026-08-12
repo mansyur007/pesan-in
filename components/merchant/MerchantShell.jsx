@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { initNotifications, ensurePermission, subscribeToPush } from '@/lib/notify';
 
 const TABS = [
   { path: '/merchant', label: 'Pesanan', icon: '🧾' },
@@ -13,6 +15,14 @@ const TABS = [
 export default function MerchantShell({ title, subtitle, headerRight, newCount = 0, children }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  // Aktifkan push di halaman merchant manapun yang dibuka duluan, supaya "pesanan
+  // baru" tetap masuk walau merchant sedang membuka tab Menu/Toko, bukan Pesanan.
+  useEffect(() => {
+    initNotifications().then(() => {
+      ensurePermission().then((granted) => granted && subscribeToPush());
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24">

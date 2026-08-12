@@ -7,7 +7,7 @@ import BackBar from '@/components/ui/BackBar';
 import Stars from '@/components/ui/Stars';
 import ChatButton from '@/components/chat/ChatButton';
 import { fmtRp, STATUS_FLOW, STATUS_LABEL } from '@/lib/format';
-import { initNotifications, ensurePermission, notify } from '@/lib/notify';
+import { initNotifications, ensurePermission, notify, subscribeToPush } from '@/lib/notify';
 
 const OrderMap = dynamic(() => import('@/components/maps/OrderMap'), {
   ssr: false,
@@ -31,10 +31,12 @@ export default function OrderTrackingClient({ initialOrder }) {
   const rejected = o.status === 'rejected';
   const closed = done || rejected;
 
-  // Aktifkan notifikasi saat halaman tracking dibuka.
+  // Aktifkan notifikasi saat halaman tracking dibuka. subscribeToPush() menambah
+  // jalur push server (jalan walau tab ditutup) di atas notify() yang polling-based.
   useEffect(() => {
-    initNotifications();
-    ensurePermission();
+    initNotifications().then(() => {
+      ensurePermission().then((granted) => granted && subscribeToPush());
+    });
   }, []);
 
   // Poll status sampai selesai; kirim notifikasi tiap status berubah.

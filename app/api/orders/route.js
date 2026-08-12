@@ -9,8 +9,34 @@ import {
   driverComplete,
 } from '@/lib/db/queries';
 import { DELIVERY_FEE, GAS_FEE } from '@/lib/db/schema';
+import { STATUS_LABEL, fmtRp } from '@/lib/format';
+import { sendPushToUser } from '@/lib/push/send';
 
 export const runtime = 'nodejs';
+
+// Push best-effort: sebuah pesanan sudah berpindah status di DB begitu fungsi
+// query di atas mengembalikan ok:true, jadi kegagalan mengirim push (device
+// offline, subscription basi, dst.) tidak boleh menggagalkan response API.
+function notifyBuyer(order) {
+  if (!order?.buyer_id) return;
+  sendPushToUser(order.buyer_id, {
+    title: 'Pesan.in — Update pesanan',
+    body: `${STATUS_LABEL[order.status]} · ${order.merchant?.name || ''}`,
+    data: { url: `/orders/${order.id}` },
+    tag: `order-${order.id}`,
+  }).catch(() => {});
+}
+
+function notifyMerchant(ownerId, order) {
+  if (!ownerId) return;
+  const itemCount = (order.items || []).reduce((a, i) => a + i.qty, 0);
+  sendPushToUser(ownerId, {
+    title: 'Pesan.in — Pesanan baru!',
+    body: `${itemCount} item · ${fmtRp(order.subtotal)}`,
+    data: { url: '/merchant' },
+    tag: 'merchant-orders',
+  }).catch(() => {});
+}
 
 export async function POST(req) {
   const user = await getCurrentUser();
@@ -55,6 +81,7 @@ export async function POST(req) {
       address,
       note,
     });
+    notifyMerchant(merchant.owner_id, order);
     return NextResponse.json({ ok: true, order });
   }
 
@@ -68,6 +95,7 @@ export async function POST(req) {
       return NextResponse.json({ ok: false, error: 'Status tidak valid.' }, { status: 400 });
     }
     const result = advanceOrderStatus(orderId, status, { merchantId: merchant.id });
+    if (result.ok) notifyBuyer(result.order);
     return NextResponse.json(result, { status: result.ok ? 200 : 400 });
   }
 
@@ -77,6 +105,7 @@ export async function POST(req) {
     const merchant = getMerchantByOwner(user.id);
     if (!merchant) return NextResponse.json({ ok: false, error: 'Toko tidak ditemukan.' }, { status: 404 });
     const result = rejectOrder(body.orderId, merchant.id);
+    if (result.ok) notifyBuyer(result.order);
     return NextResponse.json(result, { status: result.ok ? 200 : 400 });
   }
 
@@ -84,6 +113,7 @@ export async function POST(req) {
   if (action === 'driver-accept') {
     if (user.role !== 'driver') return NextResponse.json({ ok: false, error: 'Bukan driver.' }, { status: 403 });
     const result = driverAccept(body.orderId, user.id);
+    if (result.ok) notifyBuyer(result.order);
     return NextResponse.json(result, { status: result.ok ? 200 : 400 });
   }
 
@@ -91,6 +121,7 @@ export async function POST(req) {
   if (action === 'driver-complete') {
     if (user.role !== 'driver') return NextResponse.json({ ok: false, error: 'Bukan driver.' }, { status: 403 });
     const result = driverComplete(body.orderId, user.id);
+    if (result.ok) notifyBuyer(result.order);
     return NextResponse.json(result, { status: result.ok ? 200 : 400 });
   }
 

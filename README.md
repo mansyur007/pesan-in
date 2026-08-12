@@ -91,7 +91,7 @@ Halaman tracking pembeli mem-*polling* status sehingga update lintas peran tampi
 - Checkout: rincian escrow + biaya gas
 - **Tracking**: peta rute, timeline, receipt on-chain
 - 📞 **Telepon & 💬 chat driver** in-app
-- 🔔 **Notifikasi** tiap status pesanan berubah
+- 🔔 **Notifikasi push** tiap status pesanan berubah — tetap masuk walau app tertutup
 - Riwayat pesanan & halaman akun + wallet
 
 </td>
@@ -237,11 +237,11 @@ public/sw.js               # service worker notifikasi
 
 - [x] 📞💬 Telepon & chat driver in-app
 - [x] 🔔 Notifikasi status pesanan
+- [x] 🔔 **Web Push sungguhan** — VAPID + server push (kunci disimpan di `app.db`, tanpa setup eksternal), menggantikan notifikasi yang sebelumnya hanya jalan selagi tab terbuka
 - [x] 🧑‍🍳 Manajemen menu mandiri untuk merchant
 - [x] 🏪 **Redesign merchant gaya GoBiz** — 3 halaman terpisah (Pesanan · Menu · Toko) dengan bottom-tab, filter status pesanan, tombol terima/tolak, & statistik toko (pesanan & pendapatan harian). Referensi: `pesanin-mockup/pesanin/merchant.jsx`
 - [ ] Integrasi smart contract escrow Polygon sungguhan (kini mock tx hash)
 - [ ] Wallet & Top Up nyata (saldo MATIC)
-- [ ] Web Push sungguhan (VAPID + server push, kini notifikasi via polling client)
 - [ ] Perluasan area di luar Gunungpati
 
 ---
