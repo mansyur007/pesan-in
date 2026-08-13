@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pesanin — Identitas Logo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --orange:#F97316;
+    --orange-deep:#EA580C;
+    --orange-soft:#FFF1E6;
+    --ink:#211A14;
+    --ink-soft:#6B5F54;
+    --paper:#FFFBF7;
+    --line:#EBE2D8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  body{
+    font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+    background:var(--paper);color:var(--ink);
+    background-image:radial-gradient(circle at 1px 1px,#EFE6DA 1px,transparent 0);
+    background-size:26px 26px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:72px 28px 120px;}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--orange-deep);}
+  .lead{font-size:18px;line-height:1.65;color:var(--ink-soft);max-width:62ch;}
+  h2.section{font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:14px;margin-bottom:26px;}
+  h2.section::after{content:"";height:1px;flex:1;background:var(--line);}
+  .card{background:#fff;border:1px solid var(--line);border-radius:24px;}
+  .shadow{box-shadow:0 1px 0 #fff inset,0 18px 40px -28px rgba(33,26,20,.35);}
+  .mono-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
+
+  /* ---- wordmark ---- */
+  .wordmark{font-weight:800;letter-spacing:-.03em;line-height:.9;color:var(--ink);position:relative;display:inline-block;}
+  .wordmark .dot{color:var(--orange);}
+  .lockup{display:flex;align-items:center;gap:18px;}
+
+  section{margin-top:72px;}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--orange-deep);background:var(--orange-soft);border:1px solid #FBD9BF;padding:7px 14px;border-radius:999px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <span class="eyebrow">Identitas Visual</span>
+  <div style="display:flex;align-items:center;gap:26px;margin:22px 0 30px;flex-wrap:wrap;">
+    <div id="hero-mark" style="width:108px;height:108px;"></div>
+    <div class="wordmark" style="font-size:92px;">pesan<span class="dot">i</span>n</div>
+  </div>
+  <p class="lead">Sebuah pin yang sekaligus gelembung pesan — dua arti kata <em>“pesan”</em> dalam satu bentuk. Menandai tempat nyata di Gunungpati, dan sebuah permintaan yang dikirim. Di jantungnya, satu titik oranye: pesananmu, sepiring makanan, sebuah node di rantai — nilai berpindah langsung, tanpa potongan.</p>
+
+  <div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;">
+    <span class="pill">🍊 0% komisi</span>
+    <span class="pill">📍 Hyperlokal · Gunungpati</span>
+    <span class="pill">⛓️ Transparan on-chain</span>
+  </div>
+
+  <!-- ANATOMI -->
+  <section>
+    <h2 class="section">Anatomi Simbol</h2>
+    <div class="card shadow" style="padding:40px;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;">
+      <div style="display:flex;justify-content:center;">
+        <div id="anatomy" style="width:230px;height:230px;"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="anat-row" data-k="1">
+          <h3>Pin + gelembung</h3>
+          <p>Bentuk dasar menyatukan pin peta (antar ke lokasi) dan balon pesan — <em>pesan</em> sebagai memesan <em>dan</em> sebagai pesan.</p>
+        </div>
+        <div class="anat-row" data-k="2">
+          <h3>Huruf “p”</h3>
+          <p>Ruang negatif membentuk <em>p</em> dari Pesanin — lowercase, membulat, ramah dan bersahaja.</p>
+        </div>
+        <div class="anat-row" data-k="3">
+          <h3>Titik oranye</h3>
+          <p>Inti yang menyala: pesanan, piring di meja, node di blockchain. Titik yang sama menyalakan huruf “i” pada wordmark.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCKUPS -->
+  <section>
+    <h2 class="section">Penggunaan Logo</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+      <div class="card shadow" style="padding:40px;display:flex;flex-direction:column;gap:26px;justify-content:center;align-items:center;min-height:230px;">
+        <div class="lockup">
+          <div class="lk-mark" style="width:56px;height:56px;"></div>
+          <div class="wordmark" style="font-size:48px;">pesan<span class="dot">i</span>n</div>
+        </div>
+        <span class="mono-label">Lockup horizontal · utama</span>
+      </div>
+      <div class="card shadow" style="padding:40px;display:flex;flex-direction:column;gap:26px;justify-content:center;align-items:center;min-height:230px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <div class="lk-mark" style="width:64px;height:64px;"></div>
+          <div class="wordmark" style="font-size:40px;">pesan<span class="dot">i</span>n</div>
+        </div>
+        <span class="mono-label">Lockup vertikal</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section>
+    <h2 class="section">Variasi Warna</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
+      <div class="card" style="overflow:hidden;">
+        <div style="background:#fff;height:150px;display:grid;place-items:center;"><div class="v-mark" data-variant="color" style="width:78px;height:78px;"></div></div>
+        <div style="padding:14px 16px;border-top:1px solid var(--line);"><span class="mono-label">Penuh warna</span></div>
+      </div>
+      <div class="card" style="overflow:hidden;">
+        <div style="background:var(--orange);height:150px;display:grid;place-items:center;"><div class="v-mark" data-variant="onorange" style="width:78px;height:78px;"></div></div>
+        <div style="padding:14px 16px;border-top:1px solid var(--line);"><span class="mono-label">Di atas oranye</span></div>
+      </div>
+      <div class="card" style="overflow:hidden;">
+        <div style="background:var(--ink);height:150px;display:grid;place-items:center;"><div class="v-mark" data-variant="white" style="width:78px;height:78px;"></div></div>
+        <div style="padding:14px 16px;border-top:1px solid var(--line);"><span class="mono-label">Mono putih</span></div>
+      </div>
+      <div class="card" style="overflow:hidden;">
+        <div style="background:#fff;height:150px;display:grid;place-items:center;"><div class="v-mark" data-variant="black" style="width:78px;height:78px;"></div></div>
+        <div style="padding:14px 16px;border-top:1px solid var(--line);"><span class="mono-label">Mono tinta</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP ICON + CLEARSPACE -->
+  <section>
+    <h2 class="section">Ikon Aplikasi & Ruang Aman</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+      <div class="card shadow" style="padding:40px;display:flex;align-items:center;gap:30px;justify-content:center;">
+        <div id="appicon-lg" style="width:120px;height:120px;"></div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div id="appicon-md" style="width:64px;height:64px;"></div>
+          <div id="appicon-sm" style="width:40px;height:40px;"></div>
+          <span class="mono-label">App icon · squircle</span>
+        </div>
+      </div>
+      <div class="card shadow" style="padding:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;">
+        <div id="clearspace" style="width:150px;height:150px;"></div>
+        <span class="mono-label" style="text-align:center;">Jaga ruang kosong ≥ tinggi titik di setiap sisi</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLOR / TYPE TOKENS -->
+  <section>
+    <h2 class="section">Warna & Huruf</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+      <div class="card shadow" style="padding:28px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="sw" style="background:#F97316;color:#fff;"><b>Pesan Orange</b><span>#F97316</span></div>
+          <div class="sw" style="background:#EA580C;color:#fff;"><b>Deep Orange</b><span>#EA580C</span></div>
+          <div class="sw" style="background:#FFF1E6;color:#9A4A1B;border:1px solid #FBD9BF;"><b>Soft Peach</b><span>#FFF1E6</span></div>
+          <div class="sw" style="background:#211A14;color:#fff;"><b>Ink</b><span>#211A14</span></div>
+        </div>
+      </div>
+      <div class="card shadow" style="padding:28px;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+        <span class="mono-label">Tipografi</span>
+        <div style="font-size:34px;font-weight:800;letter-spacing:-.02em;">Plus Jakarta Sans</div>
+        <div style="font-size:15px;color:var(--ink-soft);line-height:1.6;margin-top:4px;">Dipesan khusus untuk kota Jakarta — suara Indonesia untuk produk Indonesia. ExtraBold untuk wordmark, Regular–SemiBold untuk antarmuka.</div>
+        <div style="font-size:22px;margin-top:12px;letter-spacing:-.01em;"><span style="font-weight:400;">Aa</span> <span style="font-weight:600;">Aa</span> <span style="font-weight:800;">Aa</span> <span style="font-weight:500;font-style:italic;">Aa</span> &nbsp;<span style="color:var(--ink-soft);font-weight:500;">0123456789</span></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<style>
+  .anat-row h3{font-size:16px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:10px;}
+  .anat-row h3::before{content:attr(data-n);width:22px;height:22px;border-radius:50%;background:var(--orange-soft);color:var(--orange-deep);font-size:12px;display:inline-grid;place-items:center;border:1px solid #FBD9BF;}
+  .anat-row p{font-size:14px;line-height:1.6;color:var(--ink-soft);}
+  .anat-row[data-k="1"] h3::before{content:"1";}
+  .anat-row[data-k="2"] h3::before{content:"2";}
+  .anat-row[data-k="3"] h3::before{content:"3";}
+  .sw{border-radius:14px;padding:16px;height:92px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;}
+  .sw b{font-size:13px;font-weight:700;}
+  .sw span{font-size:12px;font-family:ui-monospace,monospace;opacity:.85;}
+</style>
+
+<script>
+/* ---------- The Pesanin mark, drawn from pure geometry (font-independent) ---------- */
+function markSVG(opts){
+  var o = Object.assign({pin:'#F97316', glyph:'#ffffff', dot:'#F97316'}, opts||{});
+  return ''
+  + '<svg viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-label="Pesanin">'
+  +   '<path d="M32 4C18.7 4 8 14.7 8 28c0 14.4 16.3 26.4 24 32 7.7-5.6 24-17.6 24-32C56 14.7 45.3 4 32 4Z" fill="'+o.pin+'"/>'
+  +   '<circle cx="33" cy="25" r="11" fill="'+o.glyph+'"/>'
+  +   '<rect x="19.5" y="13.5" width="6.6" height="29" rx="3.3" fill="'+o.glyph+'"/>'
+  +   '<circle cx="33" cy="25" r="4.6" fill="'+o.dot+'"/>'
+  +   '</svg>';
+}
+/* just the "p" glyph (for app icon) */
+function glyphSVG(stem,dotColor){
+  return ''
+  + '<svg viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">'
+  +   '<circle cx="34" cy="27" r="13" fill="'+stem+'"/>'
+  +   '<rect x="19" y="13" width="7.6" height="34" rx="3.8" fill="'+stem+'"/>'
+  +   '<circle cx="34" cy="27" r="5.4" fill="'+dotColor+'"/>'
+  +   '</svg>';
+}
+function squircle(bg){
+  return 'border-radius:24%;background:'+bg+';box-shadow:0 10px 24px -12px rgba(233,88,12,.6);';
+}
+
+function set(id,html){var el=document.getElementById(id);if(el)el.innerHTML=html;}
+
+set('hero-mark', markSVG());
+set('anatomy', markSVG());
+
+document.querySelectorAll('.lk-mark').forEach(function(el){el.innerHTML=markSVG();});
+
+document.querySelectorAll('.v-mark').forEach(function(el){
+  var v=el.dataset.variant;
+  if(v==='color')    el.innerHTML=markSVG();
+  if(v==='onorange') el.innerHTML=markSVG({pin:'#ffffff', glyph:'#F97316', dot:'#ffffff'});
+  if(v==='white')    el.innerHTML=markSVG({pin:'#ffffff', glyph:'#211A14', dot:'#ffffff'});
+  if(v==='black')    el.innerHTML=markSVG({pin:'#211A14', glyph:'#ffffff', dot:'#211A14'});
+});
+
+/* app icons */
+function appIcon(el,size){
+  el.style.cssText += squircle('#F97316');
+  el.style.display='grid';el.style.placeItems='center';
+  var inner=document.createElement('div');
+  inner.style.width='58%';inner.style.height='58%';
+  inner.innerHTML=glyphSVG('#ffffff','#F97316');
+  el.appendChild(inner);
+}
+['appicon-lg','appicon-md','appicon-sm'].forEach(function(id){var el=document.getElementById(id);if(el)appIcon(el);});
+
+/* clearspace diagram */
+(function(){
+  var el=document.getElementById('clearspace');
+  if(!el)return;
+  el.style.cssText+='position:relative;display:grid;place-items:center;border-radius:18px;outline:2px dashed #FBD9BF;outline-offset:-1px;padding:30px;';
+  var inner=document.createElement('div');
+  inner.style.width='100%';inner.style.height='100%';
+  inner.innerHTML=markSVG();
+  el.appendChild(inner);
+})();
+</script>
+</body>
+</html>
