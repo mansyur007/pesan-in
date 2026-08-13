@@ -4,7 +4,7 @@
 
 ### Delivery makanan **0% komisi**, transparan di blockchain — khusus Gunungpati, Semarang.
 
-Harga ke merchant, ongkir ke driver — **langsung, tanpa potongan platform**. Setiap transaksi dicatat on-chain di Polygon.
+Harga ke merchant, ongkir ke driver — **langsung, tanpa potongan platform**. Penyelesaian dana lewat *smart contract escrow* di Polygon.
 
 <br/>
 
@@ -21,6 +21,8 @@ Harga ke merchant, ongkir ke driver — **langsung, tanpa potongan platform**. S
 ## ✨ Kenapa Pesan.in?
 
 Aplikasi food-delivery konvensional memotong 20–30% dari setiap transaksi. **Pesan.in menghapus potongan itu.** Pembeli bayar sekali (makanan + ongkir + biaya jaringan), dana ditahan di *smart contract escrow*, lalu dirilis otomatis ke merchant & driver saat pesanan selesai.
+
+> ⚠️ **Status escrow:** contract-nya sudah ditulis ([`contracts/PesaninEscrow.sol`](contracts/PesaninEscrow.sol)) dan jalur payout sudah tersambung ke aplikasi, tapi **mati secara default** — tanpa konfigurasi, semua tx hash masih simulasi. Detail & cara mengaktifkan: [Escrow on-chain](#-escrow-on-chain).
 
 > 🎯 **MVP fokus area Gunungpati, Semarang** — ekosistem tiga peran dalam satu aplikasi.
 
@@ -204,9 +206,11 @@ app/
    └─ orders/              # buat order, aksi status, & chat per pesanan
 
 components/                # ui · buyer · merchant · driver · chat · maps · layout
+contracts/                 # PesaninEscrow.sol (escrow 0% komisi)
 lib/
 ├─ db/                     # schema + seed, query, users (SQLite lokal)
 ├─ auth/                   # session & konstanta (edge-safe)
+├─ chain/escrow.js         # jembatan ke PesaninEscrow (opsional, default mati)
 ├─ notify.js               # notifikasi status (service worker + Web Notifications)
 └─ format.js               # util format Rupiah, label status, biaya
 public/sw.js               # service worker notifikasi
@@ -218,7 +222,48 @@ public/sw.js               # service worker notifikasi
 - 🍪 **Session bertanda tangan** — cookie berisi `<user id>.<HMAC-SHA256>`; tanpa tanda tangan yang cocok cookie ditolak. Secret dari `SESSION_SECRET`, atau dibuat acak sekali & disimpan di `app.db` bila env kosong.
 - 🙈 **Detail pesanan tertutup** — alamat & nomor HP hanya bisa dilihat pembeli, driver yang mengambil, dan pemilik toko terkait.
 - ⚡ **Edge-safe middleware** — konstanta auth dipisah agar middleware tak menarik modul native.
+- ⛓️ **Escrow opsional & fail-safe** — `ethers` di-import dinamis dan hanya saat escrow aktif, sehingga jalur simulasi tak pernah bergantung padanya. Kegagalan settle (RPC mati, gas kurang, wallet kosong) di-log tanpa menggagalkan pesanan yang sudah `delivered` di DB.
 - 💰 **0% komisi** — total bayar = subtotal + ongkir + biaya jaringan; tidak ada potongan platform.
+
+---
+
+## ⛓️ Escrow on-chain
+
+Escrow **mati secara default** dan aplikasi dirancang tetap berfungsi penuh tanpanya — `npm run dev` tidak butuh RPC, wallet, atau contract yang ter-deploy. Selama mati, `tx_hash` diisi hash acak sebagai placeholder UI.
+
+### Yang sudah tersambung
+
+| Jalur | Status | Catatan |
+|:---|:---|:---|
+| **Settle** — payout subtotal → merchant, ongkir → driver | ✅ Tersambung | Dipicu saat driver menandai pesanan selesai. `settleOrder()` ber-`onlyOwner`, jadi cukup dipanggil server pakai kunci platform. |
+| **Fund** — buyer deposit ke escrow | ⏳ Masih simulasi | Butuh tanda tangan buyer; desainnya menunggu keputusan **custodial vs non-custodial** (lihat di bawah). |
+| **Baca state contract** | ✅ Tersedia | `readOrderOnChain()` di [`lib/chain/escrow.js`](lib/chain/escrow.js). |
+
+### Mengaktifkan
+
+1. Deploy [`contracts/PesaninEscrow.sol`](contracts/PesaninEscrow.sol) ke Polygon Amoy (testnet) atau mainnet.
+2. Isi di `.env.local`:
+   ```
+   NEXT_PUBLIC_POLYGON_RPC_URL=https://rpc-amoy.polygon.technology
+   NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS=0x…   # alamat hasil deploy
+   PLATFORM_PRIVATE_KEY=0x…                  # kunci owner contract
+   ```
+3. Isi `wallet_address` untuk merchant & driver — tanpa alamat tujuan yang valid, payout dilewati (bukan gagal) dan hash simulasi tetap dipakai.
+
+Ketiganya harus terisi; kalau salah satu kosong atau contract address masih address nol, escrow tetap mati. Cek alasannya lewat `chainStatus()`.
+
+> 🔑 `PLATFORM_PRIVATE_KEY` mengendalikan payout — pakai wallet operasional khusus, jangan wallet pribadi, dan jangan pernah di-commit.
+
+### Keputusan yang masih terbuka
+
+Jalur **fund** belum diimplementasikan karena bercabang dua dan pilihannya mengubah arsitektur secara material:
+
+- **Non-custodial** — buyer connect wallet (MetaMask/WalletConnect) dan tanda tangan `fundOrder()` sendiri. Paling sesuai semangat transparansi, tapi menaikkan friksi onboarding dan mensyaratkan buyer punya MATIC.
+- **Custodial** — platform pegang kunci, saldo dikelola di aplikasi (sejalan dengan kolom `matic_balance` yang sudah ada). Onboarding mulus, tapi platform menanggung tanggung jawab kustodian.
+
+### Catatan keamanan contract
+
+`settleOrder()` dan `cancelOrder()` sepenuhnya bergantung pada `onlyOwner` — platform bertindak sebagai oracle tepercaya. Untuk produksi, pertimbangkan *signed message* dari buyer + driver agar penyelesaian tidak bergantung pada satu kunci saja.
 
 ---
 
@@ -240,8 +285,9 @@ public/sw.js               # service worker notifikasi
 - [x] 🔔 **Web Push sungguhan** — VAPID + server push (kunci disimpan di `app.db`, tanpa setup eksternal), menggantikan notifikasi yang sebelumnya hanya jalan selagi tab terbuka
 - [x] 🧑‍🍳 Manajemen menu mandiri untuk merchant
 - [x] 🏪 **Redesign merchant gaya GoBiz** — 3 halaman terpisah (Pesanan · Menu · Toko) dengan bottom-tab, filter status pesanan, tombol terima/tolak, & statistik toko (pesanan & pendapatan harian). Referensi: `pesanin-mockup/pesanin/merchant.jsx`
-- [ ] Integrasi smart contract escrow Polygon sungguhan (kini mock tx hash)
-- [ ] Wallet & Top Up nyata (saldo MATIC)
+- [x] ⛓️ **Lapisan escrow Polygon** — `PesaninEscrow.sol` tersambung ke aplikasi lewat [`lib/chain/escrow.js`](lib/chain/escrow.js); jalur **settle** (payout ke merchant & driver) sudah nyata di balik konfigurasi env, default mati. Lihat [Escrow on-chain](#-escrow-on-chain)
+- [ ] Jalur **fund** on-chain (buyer deposit) — menunggu keputusan custodial vs non-custodial
+- [ ] Wallet & Top Up nyata (saldo MATIC) + UI pengisian `wallet_address` untuk merchant & driver
 - [ ] Perluasan area di luar Gunungpati
 
 ---

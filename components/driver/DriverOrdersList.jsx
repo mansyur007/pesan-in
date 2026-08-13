@@ -153,7 +153,8 @@ export default function DriverOrdersList({ available, mine }) {
   async function completeOrder(id) {
     const data = await call('driver-complete', id);
     if (data?.ok && data.txHash) {
-      alert(`Dana didistribusi otomatis lewat smart contract.\nTx hash (mock): ${data.txHash.slice(0, 22)}…`);
+      const label = data.simulated ? 'Tx hash (simulasi)' : 'Tx hash';
+      alert(`Dana didistribusi otomatis lewat smart contract.\n${label}: ${data.txHash.slice(0, 22)}…`);
     }
   }
 

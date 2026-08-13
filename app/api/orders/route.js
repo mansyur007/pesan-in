@@ -7,10 +7,13 @@ import {
   rejectOrder,
   driverAccept,
   driverComplete,
+  getPayoutAddresses,
+  setSettlementTx,
 } from '@/lib/db/queries';
 import { DELIVERY_FEE, GAS_FEE } from '@/lib/db/schema';
 import { STATUS_LABEL, fmtRp } from '@/lib/format';
 import { sendPushToUser } from '@/lib/push/send';
+import { isChainEnabled, settleOrderOnChain } from '@/lib/chain/escrow';
 
 export const runtime = 'nodejs';
 
@@ -117,12 +120,36 @@ export async function POST(req) {
     return NextResponse.json(result, { status: result.ok ? 200 : 400 });
   }
 
-  // ---- Driver: selesaikan pesanan (settle on-chain mock) ----
+  // ---- Driver: selesaikan pesanan (payout escrow) ----
   if (action === 'driver-complete') {
     if (user.role !== 'driver') return NextResponse.json({ ok: false, error: 'Bukan driver.' }, { status: 403 });
     const result = driverComplete(body.orderId, user.id);
-    if (result.ok) notifyBuyer(result.order);
-    return NextResponse.json(result, { status: result.ok ? 200 : 400 });
+    if (!result.ok) return NextResponse.json(result, { status: 400 });
+
+    notifyBuyer(result.order);
+
+    // Pesanan sudah berstatus delivered di DB begitu driverComplete() ok, jadi
+    // kegagalan settle on-chain (RPC down, gas kurang, wallet belum diisi) tidak
+    // boleh menggagalkan response — receipt simulasi tetap dipakai dan settle
+    // bisa diulang manual. Selama chain OFF blok ini dilewati sepenuhnya.
+    if (isChainEnabled()) {
+      try {
+        const addresses = getPayoutAddresses(body.orderId);
+        const settled = await settleOrderOnChain({
+          orderId: body.orderId,
+          merchantAddress: addresses?.merchantAddress,
+          driverAddress: addresses?.driverAddress,
+        });
+        if (settled) {
+          setSettlementTx(body.orderId, settled.txHash);
+          return NextResponse.json({ ...result, txHash: settled.txHash, simulated: false });
+        }
+      } catch (err) {
+        console.error('[escrow] settle gagal untuk order', body.orderId, err);
+      }
+    }
+
+    return NextResponse.json(result);
   }
 
   return NextResponse.json({ ok: false, error: 'Unknown action' }, { status: 400 });
